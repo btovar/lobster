@@ -66,11 +66,17 @@ For the simple.py script, we're using CMSSW_10_6_26. There are two options:
 2. install CMSSW_10_6_26 somewhere else, and edit the path in simple.py on line 45: `release='<your-path-to-CMSSW_10_6_26>'`
 
 # Possible Errors
-After submitting a lobster process and starting a work_queue_factory, if there are no errors in `process.err` or `process_debug.log` but workers are never assigned to the job do the follwing: 
+After submitting a lobster process and starting a work_queue_factory, if there are no errors in `process.err` or `process_debug.log` but workers are never assigned to the job, try the follwing: 
 - Kill the current work_queue_factory. 
 - Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json > /tmp/${USER}_factory.log &`
 
 If you submit a lobster process and get an error related to `parrot_run` in the `process.err` file, do the following while in the conda environment to add to your path: 
 ```
 export PATH="$PATH:/afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/lobster-171-cd5e3e2c-cvmfs-70dfa0d6/bin"
+```
+
+Update: 
+It is likely that instead of adding the above to your path, you will need to add this version: 
+```
+export PATH=/afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/stable/bin:$PATH
 ```
