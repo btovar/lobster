@@ -41,6 +41,7 @@ pip install -e .
 Now that the lobster-with-conda env is setup, in the future all you need to do is run the following: 
 ```
 unset PYTHONPATH
+unset PERL5LIB
 conda activate lobster-with-conda
 ```
 
@@ -61,7 +62,7 @@ After the jobs are completed, check the output. In general, lobster output is st
 For the simple.py script, we're using CMSSW_10_6_26. There are two options: 
 1. install CMSSW_10_6_26 inside the same directory where simple.py is located 
     - `lobster/examples/`
-    - inside the examples directory run `cmsrel CMSSW_10_6_26` (NOTE: this has to be done outside of lobster conda environment)
+    - inside the examples directory run `unset PERL5LIB` and `cmsrel CMSSW_10_6_26` (NOTE: this has to be done outside of lobster conda environment)
     - reminder: DO NO do cmsenv
 2. install CMSSW_10_6_26 somewhere else, and edit the path in simple.py on line 45: `release='<your-path-to-CMSSW_10_6_26>'`
 
