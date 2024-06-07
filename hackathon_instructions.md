@@ -73,7 +73,7 @@ After submitting a lobster process and starting a work_queue_factory, if there a
 
 If you submit a lobster process and get an error related to `parrot_run` in the `process.err` file, do the following while in the conda environment to add to your path: 
 ```
-export PATH="$PATH:/afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/lobster-171-cd5e3e2c-cvmfs-70dfa0d6/bin"
+cp /afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/lobster-171-cd5e3e2c-cvmfs-70dfa0d6/bin/parrot_cvmfs_static_run $CONDA_PREFIX/bin/parrot_run
 ```
 
 Update: 

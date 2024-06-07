@@ -102,7 +102,6 @@ class TaskProvider(util.Timing):
 
         self.parrot_path = os.path.dirname(util.which('parrot_run'))
         self.parrot_bin = os.path.join(self.workdir, 'bin')
-        self.parrot_lib = os.path.join(self.workdir, 'lib')
 
         self.__algo = Algo(config)
         self.__host = socket.getfqdn()
@@ -224,16 +223,13 @@ class TaskProvider(util.Timing):
                 (id_, dash.ABORTED) for id_ in self.__store.reset_units()
             )
 
-        for p in (self.parrot_bin, self.parrot_lib):
+        for p in (self.parrot_bin,):
             if not os.path.exists(p):
                 os.makedirs(p)
 
         for exe in ('parrot_run', 'chirp', 'chirp_put', 'chirp_get'):
             shutil.copy(util.which(exe), self.parrot_bin)
             subprocess.check_call(["strip", os.path.join(self.parrot_bin, exe)])
-
-        p_helper = os.path.join(os.path.dirname(self.parrot_path), 'lib', 'lib64', 'libparrot_helper.so')
-        shutil.copy(p_helper, self.parrot_lib)
 
     def copy_siteconf(self):
         storage_in = os.path.join(os.path.dirname(__file__), 'data', 'siteconf', 'PhEDEx', 'storage.xml')
@@ -273,7 +269,6 @@ class TaskProvider(util.Timing):
             (os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True),
             (os.path.join(os.path.dirname(__file__), 'data', 'report.json.in'), 'report.json.in', True),
             (self.parrot_bin, 'bin', True),
-            (self.parrot_lib, 'lib', True),
         ]
 
         # Files to make the task wrapper work without referencing WMCore
