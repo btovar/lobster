@@ -64,7 +64,6 @@ dependencies:
       - pip==20.3.4
       - protobuf==3.17.3
       - psutil==5.9.3
-      - pycurl-client==3.4.4
       - pyparsing==2.4.7
       - python-cjson==1.2.1
       - python-daemon==2.3.1
