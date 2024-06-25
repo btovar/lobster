@@ -67,6 +67,7 @@ config = Config(
         bad_exit_codes=[127, 160],
         log_level=1,
         dashboard=False,
+        #osg_version='3.6',
         #wq_port=[9123,9129]
     )
 )
