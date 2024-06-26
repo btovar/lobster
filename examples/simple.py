@@ -4,23 +4,23 @@ from lobster import cmssw
 from lobster.core import AdvancedOptions, Category, Config, Dataset, ParentDataset, StorageConfiguration, Workflow
 
 version = datetime.datetime.now().strftime('%Y%m%d_%H%M')
-input_path="/store/user/"
+#input_path="/store/user/"
+input_path = "/data/users/"
 
 storage = StorageConfiguration(
     input=[
-        "root://deepthought.crc.nd.edu/" + input_path,  # Note the extra slash after the hostname!
-        "hdfs://eddie.crc.nd.edu:19000"  + input_path,
-        "gsiftp://T3_US_NotreDame"       + input_path,
-        "srm://T3_US_NotreDame"          + input_path,
+        "root://hactar01.crc.nd.edu//data/users/"
+        #"file:///cms/cephfs/data/users/",
+        #"root://deepthought.crc.nd.edu/" + input_path,  # Note the extra slash after the hostname!
     ],
     output=[
-        "file:///hadoop/store/user/$USER/lobster_test_" + version,
-        "hdfs://eddie.crc.nd.edu:19000/store/user/$USER/lobster_test_" + version,
+        # Until a separate bug is fixed file://cms/cephfs needs to be the first output so the initial lobster validation passes. 
+        "file:///cms/cephfs/data/users/$USER/lobster_test/" + version,
+        "root://disc-head-001.crc.nd.edu//data/users/hnelson2/lobster_test/"+version,
+        #"root://hactar01.crc.nd.edu//data/users/hnelson2/lobster_test/"+version,
         # ND is not in the XrootD redirector, thus hardcode server.
         # Note the double-slash after the hostname!
-        "root://deepthought.crc.nd.edu//store/user/$USER/lobster_test_" + version,
-        "gsiftp://T3_US_NotreDame/store/user/$USER/lobster_test_" + version,
-        "srm://T3_US_NotreDame/store/user/$USER/lobster_test_" + version
+        #"root://deepthought.crc.nd.edu//store/user/$USER/lobster_test/" + version,
     ]
 )
 
@@ -38,11 +38,6 @@ data_dir = "hnelson2/testDatasets/"
 
 ttH = Workflow(
     label='ttH',
-#    dataset=cmssw.Dataset(
-#        dataset='/ttHJetToNonbb_M125_TuneCP5_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM',
-#        events_per_task=50000
-#    ),
-
     command='cmsRun simple_pset.py',
     sandbox=cmssw.Sandbox(release='CMSSW_10_6_26'),
     merge_size='3.5G',
@@ -67,7 +62,7 @@ config = Config(
         bad_exit_codes=[127, 160],
         log_level=1,
         dashboard=False,
-        #osg_version='3.6',
+        osg_version='3.6',
         #wq_port=[9123,9129]
     )
 )
