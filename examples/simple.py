@@ -9,7 +9,8 @@ input_path = "/data/users/"
 
 storage = StorageConfiguration(
     input=[
-        "root://hactar01.crc.nd.edu//data/users/"
+        "root://disc-head-001.crc.nd.edu//data/users/",
+        #"root://hactar01.crc.nd.edu//data/users/",
         #"file:///cms/cephfs/data/users/",
         #"root://deepthought.crc.nd.edu/" + input_path,  # Note the extra slash after the hostname!
     ],
