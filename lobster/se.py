@@ -404,7 +404,7 @@ class XrootD(StorageElement):
     def isdir(self, path):
         try:
             output = self.execute('stat', path)
-            for line in output.splitlines():
+            for line in output.strip("\n").splitlines():
                 field, value = line.split(':', 1)
                 if field == 'Flags':
                     # Do some silly stuff to get the flags...
