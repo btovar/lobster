@@ -4,20 +4,19 @@ from lobster import cmssw
 from lobster.core import AdvancedOptions, Category, Config, Dataset, ParentDataset, StorageConfiguration, Workflow
 
 version = datetime.datetime.now().strftime('%Y%m%d_%H%M')
-#input_path="/store/user/"
-input_path = "/data/users/"
+input_path = "/store/user"
 
 storage = StorageConfiguration(
     input=[
-        "root://disc-head-001.crc.nd.edu//data/users/",
+        "root://disc-head-001.crc.nd.edu/" + input_path,
         #"root://hactar01.crc.nd.edu//data/users/",
         #"file:///cms/cephfs/data/users/",
         #"root://deepthought.crc.nd.edu/" + input_path,  # Note the extra slash after the hostname!
     ],
     output=[
         # Until a separate bug is fixed file://cms/cephfs needs to be the first output so the initial lobster validation passes. 
-        "file:///cms/cephfs/data/users/$USER/lobster_test/" + version,
-        "root://disc-head-001.crc.nd.edu//data/users/hnelson2/lobster_test/"+version,
+        "file:///cms/cephfs/data/store/user/$USER/lobster_test/" + version,
+        "root://disc-head-001.crc.nd.edu//store/user/$USER/lobster_test/"+version,
         #"root://hactar01.crc.nd.edu//data/users/hnelson2/lobster_test/"+version,
         # ND is not in the XrootD redirector, thus hardcode server.
         # Note the double-slash after the hostname!
