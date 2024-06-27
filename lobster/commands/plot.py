@@ -806,7 +806,7 @@ class Plotter(object):
             'time_internal', 'time_polling', 'time_application'
         ]
         lobster_labels = ['status', 'create', 'action', 'update', 'fetch', 'return']
-        return_labels = ['dash', 'handler', 'updates', 'elk', 'transfers', 'cleanup', 'propagate', 'sqlite']
+        return_labels = ['handler', 'updates', 'elk', 'transfers', 'cleanup', 'propagate', 'sqlite']
 
         times = stats[:, headers['timestamp']]
         centers = ((times + np.roll(times, 1, 0)) * 0.5)[1:]

@@ -24,7 +24,6 @@ sys.path.append('python')
 
 from WMCore.DataStructs.LumiList import LumiList
 from WMCore.FwkJobReport.Report import Report
-from WMCore.Services.Dashboard.DashboardAPI import DashboardAPI
 from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig
 
 import ROOT
@@ -35,28 +34,6 @@ ROOT.gErrorIgnoreLevel = ROOT.kError
 
 from ROOT import TFile
 
-
-class Dash(object):
-
-    def __init__(self):
-        # self.__api = DashboardAPI(logr=logging.getLogger('mona'))
-        self.__api = DashboardAPI()
-
-    def configure(self, config):
-        self.__jobid = str(config['monitoring']['monitorid'])
-        self.__taskid = str(config['monitoring']['taskid'])
-        self.__syncid = str(config['monitoring']['syncid'])
-
-    def __call__(self, params):
-        # We need the context to actually configure dashboard reporting
-        with self.__api as dashboard:
-            params['MessageType'] = 'jobRuntime'
-            params['MessageTS'] = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
-            params['taskId'] = self.__taskid
-            params['jobId'] = self.__jobid
-            params['sid'] = self.__syncid
-            params['SyncGridJobId'] = self.__syncid
-            dashboard.apMonSend(params)
 
 
 class Mangler(logging.Formatter):
@@ -1035,8 +1012,6 @@ def run_command(data, config, env):
     data['exe_exit_code'] = p.returncode
     data['task_exit_code'] = data['exe_exit_code']
 
-    monitor({'ExeEnd': config['executable'], 'NCores': config.get('cores', 1)})
-
     if 'cmsRun' in config['executable']:
         if p.returncode == 0:
             parse_fwk_report(data, config, 'report.xml')
@@ -1094,78 +1069,6 @@ def run_epilogue(data, config, env):
         data['transfers'] = transfers
 
 
-def send_initial_dashboard_update(data, config):
-    # Dashboard does not like Unicode, just ASCII encoding
-    syncid = str(config['monitoring']['syncid'])
-
-    try:
-        if os.environ.get("PARROT_ENABLED", "FALSE") == "TRUE":
-            raise ValueError()
-        sync_ce = loadSiteLocalConfig().siteName
-    except Exception:
-        for envvar in ["GLIDEIN_Gatekeeper", "OSG_HOSTNAME", "CONDORCE_COLLECTOR_HOST"]:
-            if envvar in os.environ:
-                sync_ce = os.environ[envvar]
-                break
-        else:
-            host = socket.getfqdn()
-            sync_ce = config['default host']
-            if host.rsplit('.')[-2:] == sync_ce.rsplit('.')[-2:]:
-                sync_ce = config['default ce']
-            else:
-                sync_ce = 'Unknown'
-
-    logger.info("using sync CE {}".format(sync_ce))
-
-    parameters = {
-        'ExeStart': str(config['executable']),
-        'NCores': config.get('cores', 1),
-        'SyncCE': sync_ce,
-        'SyncGridJobId': syncid,
-        'WNHostName': socket.getfqdn()
-    }
-    monitor(parameters)
-
-
-def send_final_dashboard_update(data, config):
-    cputime = data['cpu_time']
-    events_per_run = data['events_per_run']
-    exe_exit_code = data['exe_exit_code']
-    exe_time = data['task_timing']['stage_out_end'] - data['task_timing']['prologue_end']
-    task_exit_code = data['task_exit_code']
-    total_time = data['task_timing']['stage_out_end'] - data['task_timing']['wrapper_start']
-    stageout_exit_code = data['stageout_exit_code']
-    stageout_se = data['output_storage_element']
-
-    logger.debug("Execution time {}".format(total_time))
-    logger.debug("Exiting with code {}".format(task_exit_code))
-    logger.debug("Reporting ExeExitCode {}".format(exe_exit_code))
-    logger.debug("Reporting StageOutSE {}".format(stageout_se))
-    logger.debug("Reporting StageOutExitCode {}".format(stageout_exit_code))
-
-    parameters = {
-        'ExeTime': str(exe_time),
-        'ExeExitCode': str(exe_exit_code),
-        'JobExitCode': str(task_exit_code),
-        'JobExitReason': '',
-        'StageOutSE': stageout_se,
-        'StageOutExitStatus': str(stageout_exit_code),
-        'StageOutExitStatusReason': 'Copy succedeed with srm-lcg utils',
-        'CrabUserCpuTime': str(cputime),
-        'CrabWrapperTime': str(total_time),
-        'WCCPU': str(total_time),
-        'NoEventsPerRun': str(events_per_run),
-        'NbEvPerRun': str(events_per_run),
-        'NEventsProcessed': str(events_per_run)
-    }
-    try:
-        parameters.update({'CrabCpuPercentage': str(float(cputime) / float(total_time))})
-    except Exception:
-        pass
-
-    monitor(parameters)
-
-
 def write_report(data):
     with open('report.json', 'w') as f:
         json.dump(data, f, indent=2)
@@ -1182,7 +1085,6 @@ def write_zipfiles(data):
 
 
 if __name__ == '__main__':
-    monitor = Dash()
     mangler = Mangler()
 
     console = logging.StreamHandler()
@@ -1201,9 +1103,6 @@ if __name__ == '__main__':
     with open(configfile) as f:
         config = json.load(f)
 
-    monitor.configure(config)
-
-    atexit.register(send_final_dashboard_update, data, config)
     atexit.register(write_report, data)
     atexit.register(write_zipfiles, data)
 
@@ -1218,8 +1117,6 @@ if __name__ == '__main__':
     with mangler.output("json"):
         for l in json.dumps(config, sort_keys=True, indent=2).splitlines():
             logger.debug(l)
-
-    send_initial_dashboard_update(data, config)
 
     run_prologue(data, config, env)
     run_command(data, config, env)

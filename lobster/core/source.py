@@ -14,7 +14,6 @@ from collections import defaultdict, Counter
 from hashlib import sha1
 
 from lobster import fs, util
-from lobster.cmssw import dash
 from lobster.core import unit
 from lobster.core import Algo
 from lobster.core import MergeTaskHandler
@@ -91,7 +90,7 @@ class ReleaseSummary(object):
 class TaskProvider(util.Timing):
 
     def __init__(self, config):
-        util.Timing.__init__(self, 'dash', 'handler', 'updates', 'elk', 'transfers', 'cleanup', 'propagate', 'sqlite')
+        util.Timing.__init__(self, 'handler', 'updates', 'elk', 'transfers', 'cleanup', 'propagate', 'sqlite')
 
         self.config = config
         self.basedirs = [config.base_directory, config.startup_directory]
@@ -164,7 +163,6 @@ class TaskProvider(util.Timing):
             # Set 'cmsRun' if any of the tasks are of that type,
             # or use cmd command if all tasks execute the same cmd,
             # or use 'noncmsRun' if task cmds are different
-            # Using this for dashboard exe name reporting
             cmsconfigs = [wflow.pset for wflow in self.config.workflows]
             cmds = [wflow.command for wflow in self.config.workflows]
             if any(cmsconfigs):
@@ -214,14 +212,8 @@ class TaskProvider(util.Timing):
             else:
                 self.config.elk.resume()
 
-        self.config.advanced.dashboard.setup(self.config)
         if create:
             self.config.save()
-            self.config.advanced.dashboard.register_run()
-        else:
-            self.config.advanced.dashboard.update_task_status(
-                (id_, dash.ABORTED) for id_ in self.__store.reset_units()
-            )
 
         for p in (self.parrot_bin,):
             if not os.path.exists(p):
@@ -335,12 +327,6 @@ class TaskProvider(util.Timing):
 
         tasks = []
         ids = []
-        registration = dict(
-            zip(
-                [t[0] for t in taskinfos],
-                self.config.advanced.dashboard.register_tasks(t[0] for t in taskinfos)
-            )
-        )
 
         for (id, label, files, lumis, unique_arg, merge) in taskinfos:
             wflow = getattr(self.config.workflows, label)
@@ -351,18 +337,11 @@ class TaskProvider(util.Timing):
             inputs.append((os.path.join(jdir, 'parameters.json'), 'parameters.json', False))
             outputs = [(os.path.join(jdir, f), f) for f in ['report.json']]
 
-            monitorid, syncid = registration[id]
-
             config = {
                 'mask': {
                     'files': None,
                     'lumis': None,
                     'events': None
-                },
-                'monitoring': {
-                    'monitorid': monitorid,
-                    'syncid': syncid,
-                    'taskid': self.taskid,
                 },
                 'default host': self.__host,
                 'default ce': self.__ce,
@@ -436,8 +415,6 @@ class TaskProvider(util.Timing):
 
         logger.info("creating task(s) {0}".format(", ".join(map(str, ids))))
 
-        self.config.advanced.dashboard.free()
-
         return tasks
 
     def release(self, tasks):
@@ -449,11 +426,6 @@ class TaskProvider(util.Timing):
         input_files = defaultdict(set)
         summary = ReleaseSummary()
         transfers = defaultdict(lambda: defaultdict(Counter))
-
-        with self.measure('dash'):
-            self.config.advanced.dashboard.update_task_status(
-                (task.tag, dash.DONE) for task in tasks
-            )
 
         for task in tasks:
             with self.measure('updates'):
@@ -493,11 +465,6 @@ class TaskProvider(util.Timing):
 
             del self.__taskhandlers[task.tag]
 
-        with self.measure('dash'):
-            self.config.advanced.dashboard.update_task_status(
-                (task.tag, dash.RETRIEVED) for task in tasks
-            )
-
         if len(update) > 0:
             with self.measure('sqlite'):
                 logger.info(summary)
@@ -533,9 +500,7 @@ class TaskProvider(util.Timing):
                     logger.error('ELK failed to index summary:\n{}'.format(e))
 
     def terminate(self):
-        self.config.advanced.dashboard.update_task_status(
-            (str(id), dash.CANCELLED) for id in self.__store.running_tasks()
-        )
+        pass
 
     def done(self):
         left = self.__store.unfinished_units()
@@ -545,15 +510,7 @@ class TaskProvider(util.Timing):
         return self.__store.max_taskid()
 
     def update(self, queue):
-        # update dashboard status for all unfinished tasks.
-        # WAITING_RETRIEVAL is not a valid status in dashboard,
-        # so skipping it for now.
-        exclude_states = (dash.DONE, dash.WAITING_RETRIEVAL)
-        try:
-            self.config.advanced.dashboard.update_tasks(queue, exclude_states)
-        except Exception as e:
-            logger.warning("could not update task states to dashboard")
-            logger.exception(e)
+        pass
 
     def update_stuck(self):
         """Have the unit store updated the statistics for stuck units.
