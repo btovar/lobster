@@ -51,7 +51,7 @@ In the lobster repository, there is a python script called "simple.py". This has
 1. Set up the necessary CMSSW release in the same directory as where you're running the config file (see directions below).
 2. unset the pythonpath and start the lobster-with-conda environment 
 3. in the lobster/examples directory, do:  `lobster process simple.py`
-4. in the same directory, start a work_queue_factory with the following command: `nohup work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json > /tmp/${USER}_factory.log &`
+4. in the same directory, start a work_queue_factory with the following command: `/afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos rhel7 > /tmp/${USER}_factory.log`
 
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
