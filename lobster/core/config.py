@@ -70,12 +70,7 @@ class Config(Configurable):
         workflows : list
             A list of :class:`~lobster.core.workflow.Workflow` to process.
         label : str
-            A string to identify this project by.  This will be used in the
-            CMS dashboard, where it appears as
-            ``lobster_<user>_<label>_<hash>``, and in conjunction with
-            `WorkQueue`, where the project will be referred to as
-            ``lobster_<user>_<label>``.  The default is the date in the
-            format `YYYYmmdd`.
+            A string to identify this project by.
         advanced : AdvancedOptions
             More options for advanced users.
         plotdir : str
@@ -169,9 +164,6 @@ class AdvancedOptions(Configurable):
             workers.  As soon as a task returns with an exit code from this
             list, the worker it ran on will be blacklisted and no more
             tasks send to it.
-        dashboard : :class:`~lobster.cmssw.Dashboard`
-            Use the CMS dashboard to report task status.  Set or `False` to
-            disable.
         dump_core : bool
             Produce core dumps.  Useful to debug `WorkQueue`.
         email : str
@@ -221,7 +213,6 @@ class AdvancedOptions(Configurable):
                  abort_threshold=10,
                  abort_multiplier=4,
                  bad_exit_codes=None,
-                 dashboard=None,
                  dump_core=False,
                  email=None,
                  full_monitoring=False,
@@ -247,11 +238,6 @@ class AdvancedOptions(Configurable):
         self.abort_threshold = abort_threshold
         self.abort_multiplier = abort_multiplier
         self.bad_exit_codes = bad_exit_codes if bad_exit_codes else [169]
-        self.dashboard = dashboard
-        if dashboard is None:
-            self.dashboard = cmssw.Dashboard()
-        elif not dashboard:
-            self.dashboard = cmssw.Monitor()
         self.dump_core = dump_core
         self.email = email
         self.full_monitoring = full_monitoring
