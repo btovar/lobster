@@ -90,7 +90,7 @@ class ReleaseSummary(object):
 class TaskProvider(util.Timing):
 
     def __init__(self, config):
-        util.Timing.__init__(self, 'handler', 'updates', 'elk', 'transfers', 'cleanup', 'propagate', 'sqlite')
+        util.Timing.__init__(self, 'handler', 'updates', 'transfers', 'cleanup', 'propagate', 'sqlite')
 
         self.config = config
         self.basedirs = [config.base_directory, config.startup_directory]
@@ -200,17 +200,6 @@ class TaskProvider(util.Timing):
             versions = set([w.version for w in self.config.workflows])
             if len(versions) == 1:
                 util.register_checkpoint(self.workdir, 'sandbox cmssw version', list(versions)[0])
-
-        if self.config.elk:
-            if create:
-                categories = {wflow.category.name: [] for wflow in self.config.workflows}
-                for category in categories:
-                    for workflow in self.config.workflows:
-                        if workflow.category.name == category:
-                            categories[category].append(workflow.label)
-                self.config.elk.create(categories)
-            else:
-                self.config.elk.resume()
 
         if create:
             self.config.save()
@@ -434,11 +423,6 @@ class TaskProvider(util.Timing):
 
                 wflow = getattr(self.config.workflows, handler.dataset)
 
-            with self.measure('elk'):
-                if self.config.elk:
-                    self.config.elk.index_task(task)
-                    self.config.elk.index_task_update(task_update)
-
             with self.measure('handler'):
                 if failed:
                     faildir = util.move(wflow.workdir, handler.id, 'failed')
@@ -491,13 +475,6 @@ class TaskProvider(util.Timing):
         if len(transfers) > 0:
             with self.measure('transfers'):
                 self.__store.update_transfers(transfers)
-
-        if self.config.elk:
-            with self.measure('elk'):
-                try:
-                    self.config.elk.index_summary(self.__store.workflow_status())
-                except Exception as e:
-                    logger.error('ELK failed to index summary:\n{}'.format(e))
 
     def terminate(self):
         pass

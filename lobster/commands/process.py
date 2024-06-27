@@ -39,9 +39,6 @@ class Terminate(Command):
         logger.debug("stack:\n{0}".format(''.join(traceback.format_stack())))
         util.register_checkpoint(config.workdir, 'KILLED', 'PENDING')
 
-        if config.elk:
-            config.elk.end()
-
 
 class Process(Command, util.Timing):
 
@@ -94,10 +91,6 @@ class Process(Command, util.Timing):
                                          [getattr(stats, a) for a in self.log_attributes]
                                          )) + "\n"
                             )
-
-        if self.config.elk:
-            stats = self.queue.stats_hierarchy
-            self.config.elk.index_stats(now, left, self.times, self.log_attributes, stats, category)
 
     def setup(self, argparser):
         argparser.add_argument('--finalize', action='store_true', default=False,
@@ -375,7 +368,5 @@ class Process(Command, util.Timing):
         if units_left == 0:
             logger.info("no more work left to do")
             util.sendemail("Your Lobster project is done!", self.config)
-            if self.config.elk:
-                self.config.elk.end()
             if action:
                 action.take(True)

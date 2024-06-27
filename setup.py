@@ -17,7 +17,6 @@ setup(
         'lobster.core',
         'lobster.commands',
         'lobster.monitor',
-        'lobster.monitor.elk'
     ],
     package_data={'lobster': [
         'core/data/autosense.sh',
@@ -33,10 +32,6 @@ setup(
         'commands/data/gh.png',
         'commands/data/styles.css',
         'commands/data/category.html',
-        'monitor/elk/data/index/*.json',
-        'monitor/elk/data/dash/*.json',
-        'monitor/elk/data/vis/*.json',
-        'monitor/elk/data/*.json'
     ]},
     install_requires=[
         'argparse',
