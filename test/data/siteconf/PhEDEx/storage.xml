@@ -15,8 +15,8 @@
      Bestman does not support the srm v1 protocol so we fudge it with a file result
 -->
 
-  <lfn-to-pfn protocol="file"   destination-match=".*" path-match="/+store/(.*)" result="file:/hadoop/store/$1"/>
-  <lfn-to-pfn protocol="direct" destination-match=".*" path-match="/+store/(.*)" result="/hadoop/store/$1"/>
+  <lfn-to-pfn protocol="file"   destination-match=".*" path-match="/+store/(.*)" result="file://cms/cephfs/data/store/$1"/>
+  <lfn-to-pfn protocol="direct" destination-match=".*" path-match="/+store/(.*)" result="/cms/cephfs/data/store/$1"/>
 <!-- Old bestman configuration. Replaced with gsiftp
 <lfn-to-pfn protocol="srmv2"  destination-match=".*" path-match="/+store/(.*)" result="srm://deepthought.crc.nd.edu:8443/srm/v2/server?SFN=/hadoop/store/$1"/> 
 -->
@@ -31,9 +31,9 @@
 
 <!-- Translation rules for PFN to LFN (Physical File Name to Logical File Name -->
 
-  <pfn-to-lfn protocol="file"   destination-match=".*" path-match="file:/hadoop/store/(.*)"    result="/store/$1"/>
-  <pfn-to-lfn protocol="direct" destination-match=".*" path-match="/hadoop/store/(.*)"         result="/store/$1"/>
-  <pfn-to-lfn protocol="srm"    destination-match=".*" path-match="file:/hadoop/store/(.*)"    result="/store/$1"/>
+  <pfn-to-lfn protocol="file"   destination-match=".*" path-match="file://cms/cephfs/data/store/(.*)"    result="/store/$1"/>
+  <pfn-to-lfn protocol="direct" destination-match=".*" path-match="/cms/cephfs/data/store/(.*)"         result="/store/$1"/>
+  <pfn-to-lfn protocol="srm"    destination-match=".*" path-match="file://cms/cephfs/data/store/(.*)"    result="/store/$1"/>
 <!-- Old bestman configuration. Replaced with gsiftp
 <pfn-to-lfn protocol="srmv2"  destination-match=".*" path-match=".*\?SFN=/hadoop/store/(.*)" result="/store/$1"/>
 -->

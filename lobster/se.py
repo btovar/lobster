@@ -2,9 +2,6 @@ import logging
 import os
 import random
 import re
-if 'LOBSTER_SKIP_HADOOP' not in os.environ:
-    import snakebite.client
-    import snakebite.errors
 import subprocess
 import xml.dom.minidom
 
@@ -195,64 +192,6 @@ class Local(StorageElement):
                 os.remove(path)
             except OSError:
                 pass
-
-
-class Hadoop(StorageElement):
-
-    def __init__(self, host, port, pfnprefix='/hadoop'):
-        super(Hadoop, self).__init__(pfnprefix)
-        self.__c = snakebite.client.Client(host, int(port))
-
-    @property
-    def errors(self):
-        return (Exception,)
-
-    def exists(self, path):
-        try:
-            self.__c.stat([path])
-            return True
-        except snakebite.errors.FileNotFoundException:
-            return False
-
-    def getsize(self, path):
-        return self.__c.stat([path])['blocksize']
-
-    def isdir(self, path):
-        return self.__c.stat([path])['file_type'] == 'd'
-
-    def isfile(self, path):
-        return self.__c.stat([path])['file_type'] == 'f'
-
-    def ls(self, path):
-        for data in self.__c.ls([path]):
-            yield data['path']
-
-    def mkdir(self, path, mode):
-        for data in self.__c.mkdir([path], mode=mode):
-            pass
-
-    def permissions(self, path):
-        return self.__c.stat([path])['permission']
-
-    def remove(self, *paths):
-        """Remove paths.
-
-        First try passing the entire list of paths to be removed. This
-        approach is almost instantaneous, but fails if any of the paths
-        do not exist. In that case, we try again, one by one. This takes
-        tens of milliseconds per path, but ensures that any paths that
-        do exist are removed.
-
-        """
-        try:
-            for data in self.__c.delete(list(paths)):
-                pass
-        except snakebite.errors.FileNotFoundException:
-            for path in paths:
-                try:
-                    self.__c.delete([path]).next()
-                except snakebite.errors.FileNotFoundException:
-                    pass
 
 
 class Chirp(StorageElement):
@@ -458,15 +397,14 @@ class StorageConfiguration(Configurable):
     Container for storage element configuration.
 
     Uses URLs of the form `{protocol}://{server}/{path}` to specify input
-    and output locations, where the `server` is omitted for `file` and
-    `hadoop` access.  All output URLs should point to the same physical
+    and output locations, where the `server` is omitted for `file` access.
+    All output URLs should point to the same physical
     storage, to ensure consistent data handling.  Storage elements within
     CMS, as in `T2_CH_CERN` will be expanded for the `srm` and `root`
     protocol.  Protocols supported:
 
     * `file`
     * `gsiftp`
-    * `hadoop`
     * `chirp`
     * `srm`
     * `root`
@@ -623,9 +561,6 @@ class StorageConfiguration(Configurable):
                         raise AttributeError("cannot access chirp server")
             elif protocol == 'file':
                 yield Local(path)
-            elif protocol == 'hdfs':
-                host, port = server.split(':')
-                yield Hadoop(host, port, path)
             elif protocol == 'srm':
                 yield SRM(url)
             elif protocol == 'root':

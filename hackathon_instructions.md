@@ -56,7 +56,7 @@ In the lobster repository, there is a python script called "simple.py". This has
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
 
-After the jobs are completed, check the output. In general, lobster output is stored in `hadoop`. For this simple config, there should be an `output*.root` file stored in `/hadoop/store/user/USERNAME/lobster_test_*/ttH` that is roughly 8 MB. 
+After the jobs are completed, check the output. In general, lobster output is stored in `cephfs`. For this simple config, there should be an `output*.root` file stored in `/cms/cephfs/data/store/user/USERNAME/lobster_test_*/ttH` that is roughly 8 MB.
 
 # Setting up a CMSSW environment for the simple example
 For the simple.py script, we're using CMSSW_10_6_26. There are two options: 

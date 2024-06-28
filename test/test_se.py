@@ -14,7 +14,7 @@ class TestSE(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         path = os.path.expandvars(
-            os.environ.get('LOBSTER_STORAGE', '/hadoop/store/user/') +
+            os.environ.get('LOBSTER_STORAGE', '/cms/cephfs/data/store/user/') +
             os.environ.get('LOBSTER_USER', os.environ['USER']) + '/')
         if not os.path.exists(path):
             os.makedirs(path)
@@ -69,17 +69,6 @@ class TestLocalPermissions(TestSE):
     def runTest(self):
         self.permissions('file://' + self.workdir)
 
-
-if 'LOBSTER_SKIP_HADOOP' not in os.environ:
-    class TestHadoop(TestSE):
-
-        def runTest(self):
-            self.query('hdfs://eddie.crc.nd.edu:19000' + self.workdir.replace('/hadoop', '', 1))
-
-    class TestHadoopPermissions(TestSE):
-
-        def runTest(self):
-            self.permissions('hdfs://eddie.crc.nd.edu:19000' + self.workdir.replace('/hadoop', '', 1))
 
 if 'LOBSTER_SKIP_SRM' not in os.environ:
     class TestSRM(TestSE):
