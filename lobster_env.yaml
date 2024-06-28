@@ -51,8 +51,6 @@ dependencies:
       - chardet==4.0.0
       - cycler==0.10.0
       - docutils==0.18.1
-      - elasticsearch==5.5.3
-      - elasticsearch-dsl==5.4.0
       - httplib2==0.20.4
       - idna==2.10
       - jinja2==2.11.3
