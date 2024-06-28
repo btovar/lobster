@@ -12,7 +12,7 @@ class TestDataset(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         path = os.path.expandvars(
-            os.environ.get('LOBSTER_STORAGE', '/hadoop/store/user/') +
+            os.environ.get('LOBSTER_STORAGE', '/cms/cephfs/data/store/user/') +
             os.environ.get('LOBSTER_USER', os.environ['USER']) + '/')
         if not os.path.exists(path):
             os.makedirs(path)
