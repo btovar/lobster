@@ -207,11 +207,11 @@ class Workflow(Configurable):
                  label,
                  dataset,
                  command,
+                 sandbox,
                  category=Category('default', mode='fixed'),
                  publish_label=None,
                  cleanup_input=False,
                  merge_size=-1,
-                 sandbox=None,
                  unique_arguments=None,
                  extra_inputs=None,
                  outputs=None,
@@ -255,8 +255,9 @@ class Workflow(Configurable):
         self.merge_args = shlex.split(merge_command)
         self.merge_command = self.merge_args.pop(0)
 
-        from lobster.cmssw.sandbox import Sandbox
-        self.sandbox = sandbox or Sandbox()
+        if sandbox is None:
+            raise ValueError("sandbox should not be None")
+        self.sandbox = sandbox
 
     def __repr__(self):
         override = {'category': 'category_' + self.category.name}
