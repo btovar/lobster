@@ -31,20 +31,15 @@ class Sandbox(lobster.core.Sandbox):
             directory of the release used.
         release : str
             The path to the CMSSW release to be used as a sandbox.
-            Defaults to the environment variable `LOCALRT`.
     """
 
     _mutable = {}
 
-    def __init__(self, include=None, release=None, blacklist=None, recycle=None):
+    def __init__(self, release=None, include=None, blacklist=None, recycle=None):
+        if (release is None) == (recycle is None):
+            raise AttributeError("Exactly one of release or recycle should be different from None.")
         super(Sandbox, self).__init__(recycle, blacklist)
-        if release:
-            self.release = os.path.expandvars(os.path.expanduser(release))
-        else:
-            try:
-                self.release = os.environ['LOCALRT']
-            except KeyError:
-                raise AttributeError("Need to be either in a `cmsenv` or specify a sandbox release!")
+        self.release = os.path.expandvars(os.path.expanduser(release))
         self.include = include or []
 
     def __release2filename(self, indir, rel, arch):

@@ -15,13 +15,6 @@ class TestSandbox(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.workdir)
 
-    def test_localrt(self):
-        os.environ['LOCALRT'] = 'data/sandbox/CMSSW_1_2_3'
-        sandbox = lobster.cmssw.sandbox.Sandbox()
-        version, arch, box = sandbox.package([os.path.dirname(__file__)], self.workdir)
-        assert version == 'CMSSW_2_3_4'
-        assert arch == 'slc1_234'
-
     def test_version(self):
         sandbox = lobster.cmssw.sandbox.Sandbox(release='data/sandbox/CMSSW_1_2_3')
         version, arch, box = sandbox.package([os.path.dirname(__file__)], self.workdir)
