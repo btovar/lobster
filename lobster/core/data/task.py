@@ -330,24 +330,6 @@ def check_output(config, localname, remotename):
                 return compare(p.stdout, localname)
             except RuntimeError as e:
                 logger.error(e)
-        elif output.startswith('srm://') or output.startswith('gsiftp://'):
-            if len(os.environ["LOBSTER_GFAL_COPY"]) > 0:
-                # FIXME gfal is very picky about its environment
-                prg = [os.environ["LOBSTER_GFAL_COPY"].replace('copy', 'stat')]
-                args = prg + [
-                    os.path.join(output, remotename),
-                ]
-                pruned_env = dict(env)
-                for k in ['LD_LIBRARY_PATH', 'PATH']:
-                    pruned_env[k] = ':'.join([x for x in os.environ[k].split(':') if 'CMSSW' not in x])
-                p = run_subprocess(args, env=pruned_env, capture=True)
-                try:
-                    return compare(p.stdout, localname)
-                except RuntimeError as e:
-                    logger.error(e)
-
-            else:
-                logger.info('Skipping gfal-based file check because no gfal executable defined in wrapper.')
 
     # If we get here, we tried all of the other methods and never returned a True, so return false
     return False
@@ -493,35 +475,6 @@ def copy_inputs(data, config, env):
                         break
                 else:
                     logger.info("xrootd access to input file unavailable")
-            elif input.startswith('srm://') or input.startswith('gsiftp://'):
-                logger.info("Trying srm access method")
-                prg = []
-                if len(os.environ["LOBSTER_LCG_CP"]) > 0 and not input.startswith('gsiftp://'):
-                    prg = [os.environ["LOBSTER_LCG_CP"], "-b", "-v", "-D", "srmv2", "--sendreceive-timeout", "600"]
-                elif len(os.environ["LOBSTER_GFAL_COPY"]) > 0:
-                    # FIXME gfal is very picky about its environment
-                    prg = [os.environ["LOBSTER_GFAL_COPY"]]
-
-                args = prg + [
-                    os.path.join(input, file),
-                    os.path.basename(file)
-                ]
-
-                pruned_env = dict(env)
-                for k in ['LD_LIBRARY_PATH', 'PATH']:
-                    pruned_env[k] = ':'.join([x for x in os.environ[k].split(':') if 'CMSSW' not in x])
-
-                p = run_subprocess(args, env=pruned_env)
-                if p.returncode == 0:
-                    logger.info('Successfully copied input with SRM')
-                    filename = 'file:' + os.path.basename(file)
-                    config['mask']['files'].append(filename)
-                    config['file map'][filename] = file
-                    data['transfers']['srm']['stage-in success'] += 1
-                    break
-                else:
-                    logger.error('Unable to copy input with SRM')
-                    data['transfers']['srm']['stage-in failure'] += 1
             elif input.startswith("chirp://"):
                 logger.info("Trying chirp access method")
                 server, path = re.match("chirp://([a-zA-Z0-9:.\-]+)/(.*)", input).groups()
@@ -630,43 +583,6 @@ def copy_outputs(data, config, env):
                     except Exception as e:
                         logger.critical(e)
                         data['transfers']['file']['stageout failure'] += 1
-            elif output.startswith('srm://') or output.startswith('gsiftp://'):
-                protocol = output[:output.find(':')]
-                prg = []
-                if len(os.environ["LOBSTER_LCG_CP"]) > 0 and output.startswith('srm://'):
-                    prg = [os.environ["LOBSTER_LCG_CP"], "-b", "-v", "-D", "srmv2", "--sendreceive-timeout", "600"]
-                elif len(os.environ["LOBSTER_GFAL_COPY"]) > 0:
-                    # FIXME gfal is very picky about its environment
-                    prg = [os.environ["LOBSTER_GFAL_COPY"], "-f"]
-                else:
-                    data['transfers'][protocol]['stageout failure'] += 1
-                    continue
-
-                args = prg + [
-                    "file://" + os.path.join(os.getcwd(), localname),
-                    os.path.join(output, remotename)
-                ]
-
-                pruned_env = dict(env)
-                for k in ['LD_LIBRARY_PATH', 'PATH']:
-                    pruned_env[k] = ':'.join([x for x in os.environ[k].split(':') if 'CMSSW' not in x])
-
-                ldpath = pruned_env.get('LD_LIBRARY_PATH', '')
-                if ldpath != '':
-                    ldpath += ':'
-                ldpath += os.path.join(os.path.dirname(os.path.dirname(prg[0])), 'lib64')
-                pruned_env['LD_LIBRARY_PATH'] = ldpath
-
-                p = run_subprocess(args, env=pruned_env)
-                logger.info('Checking output file transfer.')
-                if p.returncode == 0 and check_output(config, localname, remotename):
-                    logger.info('File transfer successful!')
-                    transferred.append(localname)
-                    match = server_re.match(args[-1])
-                    if match:
-                        target_se.append(match.group(1))
-                    data['transfers'][protocol]['stageout success'] += 1
-                    break
                 else:
                     data['transfers'][protocol]['failure'] += 1
             elif output.startswith("root://"):
@@ -689,7 +605,6 @@ def copy_outputs(data, config, env):
                     break
                 else:
                     data['transfers']['root']['stageout failure'] += 1
-               
             elif output.startswith("chirp://"):
                 server, path = re.match("chirp://([a-zA-Z0-9:.\-]+)/(.*)", output).groups()
 

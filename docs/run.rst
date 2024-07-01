@@ -117,7 +117,7 @@ Using a Chirp server
 --------------------
 
 Using Chirp for stage-in and stage-out can be helpful when standard CMS
-tools for file handling, i.e., XrootD and SRM, are not available.
+tools for file handling, i.e., XrootD is not available.
 
 At Notre Dame, a Chirp server is running under `eddie.crc.nd.edu:9094`.
 Make sure that your output directory can be reached with globus

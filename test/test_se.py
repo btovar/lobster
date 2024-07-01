@@ -70,19 +70,6 @@ class TestLocalPermissions(TestSE):
         self.permissions('file://' + self.workdir)
 
 
-if 'LOBSTER_SKIP_SRM' not in os.environ:
-    class TestSRM(TestSE):
-
-        def runTest(self):
-            self.query('srm://T3_US_NotreDame' +
-                       self.workdir.replace('/hadoop', '', 1))
-
-    # gfal-mkdir does not currently support setting permissions
-    # class TestSRMPermissions(TestSE):
-    #     def runTest(self):
-    #         self.permissions('srm://T3_US_NotreDame' + self.workdir.replace('/hadoop', '', 1))
-
-
 class TestChirp(TestSE):
 
     def setUp(self):
