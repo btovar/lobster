@@ -583,8 +583,6 @@ def copy_outputs(data, config, env):
                     except Exception as e:
                         logger.critical(e)
                         data['transfers']['file']['stageout failure'] += 1
-                else:
-                    data['transfers'][protocol]['failure'] += 1
             elif output.startswith("root://"):
                 args = [
                     "env",
