@@ -235,70 +235,6 @@ class Chirp(StorageElement):
             self.__c.rm(str(path))
 
 
-class SRM(StorageElement):
-
-    def __init__(self, pfnprefix):
-        super(SRM, self).__init__(pfnprefix)
-
-    def execute(self, cmd, *paths, **kwargs):
-        cmds = cmd.split()
-        args = ['gfal-' + cmds[0]] + cmds[1:] + list(paths)
-        try:
-            p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={})
-            pout, err = p.communicate()
-            if p.returncode != 0 and not kwargs.get('safe', False):
-                msg = "Failed to execute '{0}':\n{1}\n{2}".format(' '.join(args), err, pout)
-                raise IOError(msg)
-        except OSError:
-            raise AttributeError("srm utilities not available")
-        return pout
-
-    def exists(self, path):
-        try:
-            self.execute('stat', path)
-            return True
-        except Exception:
-            return False
-
-    def getsize(self, path):
-        output = self.execute('stat', path)
-        return output.splitlines()[1].split()[1]
-
-    def isdir(self, path):
-        try:
-            output = self.execute('stat', path)
-            return 'directory' in output.splitlines()[1]
-        except Exception:
-            return False
-
-    def isfile(self, path):
-        try:
-            output = self.execute('stat', path)
-            return 'regular file' in output.splitlines()[1]
-        except Exception:
-            return False
-
-    def ls(self, path):
-        for p in self.execute('ls', path).splitlines():
-            yield os.path.join(path, p)
-
-    def mkdir(self, path, mode=None):
-        self.execute('mkdir -p', path)
-
-    def permissions(self, path):
-        output = self.execute('stat', path)
-        try:
-            return int(output.splitlines()[2][9:13], 8)
-        except IndexError:
-            raise IOError
-
-    def remove(self, *paths):
-        while len(paths) != 0:
-            # FIXME safe is active because SRM does not care about directories.
-            self.execute('rm -r', *(paths[:50]), safe=True)
-            paths = paths[50:]
-
-
 class XrootD(StorageElement):
 
     def __init__(self, pfnprefix):
@@ -400,13 +336,11 @@ class StorageConfiguration(Configurable):
     and output locations, where the `server` is omitted for `file` access.
     All output URLs should point to the same physical
     storage, to ensure consistent data handling.  Storage elements within
-    CMS, as in `T2_CH_CERN` will be expanded for the `srm` and `root`
+    CMS, as in `T2_CH_CERN` will be expanded for the `root`
     protocol.  Protocols supported:
 
     * `file`
-    * `gsiftp`
     * `chirp`
-    * `srm`
     * `root`
 
     The `chirp` protocol requires an instance of a `Chirp` server.
@@ -449,8 +383,6 @@ class StorageConfiguration(Configurable):
 
     # Map protocol shorthands to actual protocol names
     __protocols = {
-        'gsiftp': 'gsiftp',
-        'srm': 'srmv2',
         'root': 'xrootd'
     }
 
@@ -561,8 +493,6 @@ class StorageConfiguration(Configurable):
                         raise AttributeError("cannot access chirp server")
             elif protocol == 'file':
                 yield Local(path)
-            elif protocol == 'srm':
-                yield SRM(url)
             elif protocol == 'root':
                 yield XrootD(url)
             else:

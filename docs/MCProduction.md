@@ -32,7 +32,6 @@ Create a Lobster configuration like this:
         output:
           - file:///cms/cephfs/data/store/user/matze/prod/v3
           - root://ndcms.crc.nd.edu//store/user/matze/prod/v3
-          - srm://T3_US_NotreDame/store/user/matze/prod/v3
 
     use dashboard: true
 
