@@ -25,8 +25,8 @@ class Status(Command):
             data.insert(i, [x[i] if len(x) > i else '' for x in headers])
 
         widths = \
-            [max(map(len, (xs[0] for xs in data)))] + \
-            [max(map(len, (str(xs[i]) for xs in data)))
+            [max(list(map(len, (xs[0] for xs in data))))] + \
+            [max(list(map(len, (str(xs[i]) for xs in data))))
              for i in range(1, len(data[0]))]
         data.insert(header_rows, ['=' * w for w in widths])
         headfmt = ' '.join('{{:^{0}}}'.format(w) for w in widths)
@@ -34,7 +34,7 @@ class Status(Command):
             widths[0]) + ' '.join('{{:>{0}}}'.format(w) for w in widths[1:])
         report = '\n'.join(
             [headfmt.format(*data[i]) for i in range(0, header_rows)] +
-            [mainfmt.format(*map(str, row)) for row in data[header_rows:]])
+            [mainfmt.format(*list(map(str, row))) for row in data[header_rows:]])
 
         logger.info("workflow summary:\n" + report)
 

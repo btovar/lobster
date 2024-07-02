@@ -69,13 +69,13 @@ def split_by_column(a, col, key=lambda x: x, threshold=None):
     """
     keys = np.unique(a[col])
     vals = [a[a[col] == v] for v in keys]
-    keys = map(key, keys)
+    keys = list(map(key, keys))
 
     if threshold:
         total = float(len(a))
-        others = filter(lambda v: len(v) / total < threshold, vals)
-        keys, vals = zip(*filter(lambda (k, v): len(v) /
-                                 total >= threshold, zip(keys, vals)))
+        others = [v for v in vals if len(v) / total < threshold]
+        keys, vals = list(zip(*[k_v for k_v in zip(keys, vals) if len(k_v[1]) /
+                                 total >= threshold]))
         if len(others) > 0:
             keys += ("Other", )
             vals += (np.concatenate(others), )
@@ -160,7 +160,7 @@ def mp_pie(vals, labels, name, plotdir=None, **kwargs):
     boxes = []
     newlabels = []
     for patch, text, label in zip(patches, texts, labels):
-        if isinstance(label, basestring) and len(text.get_text()) == 0 and len(label) > 0:
+        if isinstance(label, str) and len(text.get_text()) == 0 and len(label) > 0:
             boxes.append(patch)
             newlabels.append(label)
 
@@ -365,10 +365,10 @@ def mp_plot(a, xlabel, stub=None, ylabel='tasks', bins=50, modes=None, ymax=None
                 var = np.std(y)
                 med = np.median(y)
                 stats[label] = (avg, var, med)
-            info = u"{0}μ = {1:.3g}, σ = {2:.3g}, median = {3:.3g}"
+            info = "{0}μ = {1:.3g}, σ = {2:.3g}, median = {3:.3g}"
             t = ax.text(0.75, 0.7,
                         '\n'.join([info.format(label + ': ' if len(stats) > 1 else '', avg, var, med)
-                                   for label, (avg, var, med) in stats.items()]),
+                                   for label, (avg, var, med) in list(stats.items())]),
                         ha="center", va="center", transform=ax.transAxes, backgroundcolor='w')
             t.set_bbox({'color': 'w', 'alpha': .5, 'edgecolor': 'w'})
 
@@ -517,8 +517,7 @@ class Plotter(object):
                               'lobster_stats_{}.log'.format(category))
 
         with open(fn) as f:
-            headers = dict(map(lambda (a, b): (b, a),
-                               enumerate(f.readline()[1:].split())))
+            headers = dict([(a_b[1], a_b[0]) for a_b in enumerate(f.readline()[1:].split())])
         #stats = np.loadtxt(fn)
         stats=np.genfromtxt(fn)
 
@@ -778,7 +777,7 @@ class Plotter(object):
         ind = ind[np.argsort(errors[ind])]
         failures = failures[ind][::-1]
         table = [["All"] + list(failures)]
-        for h, c in reversed(zip(hosts, counts)):
+        for h, c in reversed(list(zip(hosts, counts))):
             host_tasks = failed_tasks[failed_tasks['host'] == h]
             table.append(
                 [h, c] + [len(host_tasks[host_tasks['exit_code'] == f]) for f in failures])
@@ -823,7 +822,7 @@ class Plotter(object):
         return_stats = dict((label, diff('source_' + label)) for label in return_labels)
 
         time_diff = ((times - np.roll(times, 1, 0)) * 1e6)[1:]
-        everything = np.sum(lobster_stats.values(), axis=0)
+        everything = np.sum(list(lobster_stats.values()), axis=0)
         other = time_diff - everything
 
         self.plot(
@@ -846,7 +845,7 @@ class Plotter(object):
         )
         wq_stats['idle'] = (idle_total - np.roll(idle_total, 1, 0))[1:]
 
-        everything = np.sum(wq_stats.values(), axis=0)
+        everything = np.sum(list(wq_stats.values()), axis=0)
         other = lobster_stats['fetch'] - everything
 
         self.plot(
@@ -861,7 +860,7 @@ class Plotter(object):
             ymax=1.
         )
 
-        everything = np.sum(return_stats.values(), axis=0)
+        everything = np.sum(list(return_stats.values()), axis=0)
         other = lobster_stats['return'] - everything
 
         self.plot(
@@ -961,7 +960,8 @@ class Plotter(object):
 
         if len(good_tasks) > 0:
             def integrate_wall(q):
-                def integrate((x, y)):
+                def integrate(xxx_todo_changeme):
+                    (x, y) = xxx_todo_changeme
                     indices = np.logical_and(stats[:, 0] >= x, stats[:, 0] < y)
                     values = stats[indices, headers[q]]
                     if len(values) > 0:
@@ -969,7 +969,7 @@ class Plotter(object):
                     return 0
                 return integrate
 
-            walltime = np.array(map(integrate_wall('committed_cores'), zip(edges[:-1], edges[1:])))
+            walltime = np.array(list(map(integrate_wall('committed_cores'), list(zip(edges[:-1], edges[1:])))))
             cputime = self.updatecpu(success_tasks, edges)
 
             centers = [(x + y) / 2 for x, y in zip(edges[:-1], edges[1:])]
@@ -996,7 +996,7 @@ class Plotter(object):
                 modes=[Plotter.HIST | Plotter.TIME]
             )
 
-            walltime = np.array(map(integrate_wall('total_cores'), zip(edges[:-1], edges[1:])))
+            walltime = np.array(list(map(integrate_wall('total_cores'), list(zip(edges[:-1], edges[1:])))))
             walltime[walltime == 0] = 1e-6
 
             ratio = np.nan_to_num(np.divide(cputime * 1.0, walltime))
@@ -1249,7 +1249,7 @@ class Plotter(object):
                  for xs in fail_values],
                 'Failed tasks', os.path.join(subdir, 'failed-tasks'),
                 modes=[Plotter.HIST | Plotter.TIME],
-                label=map(str, fail_labels)
+                label=list(map(str, fail_labels))
             )
 
             self.plot(
@@ -1330,7 +1330,7 @@ class Plotter(object):
 
             data = []
             labels = []
-            for label, (headers, stats) in self.__category_stats.items():
+            for label, (headers, stats) in list(self.__category_stats.items()):
                 data.append((stats[:, headers['timestamp']],
                              stats[:, headers['tasks_running']]))
                 labels.append(label)
@@ -1378,7 +1378,7 @@ class Plotter(object):
             for dirpath, dirnames, filenames in os.walk(logdir):
                 logs = [os.path.join(dirpath, fn)
                         for fn in filenames if fn.endswith('.log')]
-                map(os.unlink, logs)
+                list(map(os.unlink, logs))
         else:
             os.makedirs(logdir)
 
@@ -1408,8 +1408,8 @@ class Plotter(object):
             ).encode('utf-8'))
 
         def add_total(summaries):
-            numbers = zip(*[s[1:-2] for s in summaries])
-            total = map(sum, numbers)
+            numbers = list(zip(*[s[1:-2] for s in summaries]))
+            total = list(map(sum, numbers))
             total_mergeable = sum([s[-9] for s in summaries if
                                    getattr(self.config.workflows, s[0], None) and
                                    getattr(self.config.workflows, s[0]).merge_size > 0])

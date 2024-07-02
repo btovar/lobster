@@ -56,7 +56,7 @@ class ReleaseSummary(object):
             self.__exe[status] = [taskid]
 
     def wq(self, status, taskid):
-        for flag in ReleaseSummary.flags.keys():
+        for flag in list(ReleaseSummary.flags.keys()):
             if status == flag:
                 try:
                     self.__wq[flag].append(taskid)
@@ -468,7 +468,7 @@ class TaskProvider(util.Timing):
                         logger.error("error removing {0}:\n{1}".format(task.tag, e))
 
         with self.measure('propagate'):
-            for label, infos in propagate.items():
+            for label, infos in list(propagate.items()):
                 unique_args = getattr(self.config.workflows, label).unique_arguments
                 self.__store.register_files(infos, label, unique_args)
 

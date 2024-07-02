@@ -7,7 +7,7 @@ import work_queue as wq
 
 from lobster import util
 from lobster.core.dataset import FileInfo
-import unit
+from . import unit
 
 from WMCore.DataStructs.LumiList import LumiList
 
@@ -44,7 +44,7 @@ class TaskHandler(object):
     @property
     def output_info(self):
         res = FileInfo()
-        for run, lumis in self._output_info.get('runs', {-1: [-1]}).items():
+        for run, lumis in list(self._output_info.get('runs', {-1: [-1]}).items()):
             res.lumis += [(int(run), lumi) for lumi in lumis]
         res.events = self._output_info.get('events', 0)
         res.size = self._output_size
@@ -122,7 +122,7 @@ class TaskHandler(object):
             data = json.load(f)
 
             if len(data['files']['output_info']) > 0:
-                self._output_info = data['files']['output_info'].values()[0]
+                self._output_info = list(data['files']['output_info'].values())[0]
                 self._output_size = data['output_size']
 
             task_update.bytes_output = data['output_size']

@@ -77,7 +77,7 @@ class PartiallyMutable(type):
                         'class {} uses {} in the constructor, but does define it as property'.format(name, arg))
         except Exception as e:
             import sys
-            raise type(e), type(e)('{0!s}: {1}'.format(cls, e.message)), sys.exc_info()[2]
+            raise type(e)(type(e)('{0!s}: {1}'.format(cls, e.message))).with_traceback(sys.exc_info()[2])
         return res
 
     @classmethod
@@ -98,7 +98,7 @@ class PartiallyMutable(type):
         cls._actions.clear()
 
 
-class Configurable(object):
+class Configurable(object, metaclass=PartiallyMutable):
 
     """Partially mutable base object.
 
@@ -110,7 +110,6 @@ class Configurable(object):
     passed, and a bool indicating if the changed object should be appended
     to the arguments.
     """
-    __metaclass__ = PartiallyMutable
     _mutable = {}
 
     def __setattr__(self, attr, value):
@@ -137,7 +136,7 @@ class Configurable(object):
 
     def __repr__(self, override=None):
         argspec = inspect.getargspec(self.__init__)
-        defaults = dict(zip(reversed(argspec.args), reversed(argspec.defaults)))
+        defaults = dict(list(zip(reversed(argspec.args), reversed(argspec.defaults))))
         # Look for altered mutable properties, add them to constructor
         # arguments
         for arg in self._mutable:
@@ -161,7 +160,7 @@ class Configurable(object):
             return repr(getattr(self, k))
         args = ["\n    {},".format(indent(a)) for a in self.__args]
         kwargs = ["\n    {}={}".format(k, indent(attr(k)))
-                  for k, v in sorted(self.__kwargs.items(), key=lambda (x, y): x)]
+                  for k, v in sorted(list(self.__kwargs.items()), key=lambda x_y: x_y[0])]
         s = self.__name + "({}\n)".format(",".join(args + kwargs))
         return s
 
@@ -258,9 +257,9 @@ def record(cls, *fields, **defaults):
             if 'default' in defaults:
                 for field in fields:
                     setattr(self, field, defaults['default'])
-            for field, value in defaults.items():
+            for field, value in list(defaults.items()):
                 setattr(self, field, value)
-            for field, value in kwargs.items():
+            for field, value in list(kwargs.items()):
                 setattr(self, field, value)
             for field, value in zip(fields, args):
                 setattr(self, field, value)

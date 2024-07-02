@@ -198,7 +198,7 @@ def calculate_alder32(data):
     """Try to calculate checksums for output files.
     """
 
-    for fn in data['files']['output_info'].keys():
+    for fn in list(data['files']['output_info'].keys()):
         checksum = '0'
         try:
             p = subprocess.Popen(['edmFileUtil', '-a', fn], stdout=subprocess.PIPE)
@@ -249,7 +249,7 @@ def check_execution(exitcode, update=None, timing=None):
                         logger.debug(l)
                 data['task_exit_code'] = ecode
                 data.update(update)
-                logger.error("call to '{}' failed, exiting with exit code {}".format(fct.func_name, ecode))
+                logger.error("call to '{}' failed, exiting with exit code {}".format(fct.__name__, ecode))
                 sys.exit(ecode)
             finally:
                 if timing:
@@ -511,7 +511,7 @@ def copy_inputs(data, config, env):
         successes[input] += 1
 
         if config.get('accelerate stage-in', 0) > 0 and not fast_track:
-            method, count = max(successes.items(), key=lambda (x, y): y)
+            method, count = max(list(successes.items()), key=lambda x_y: x_y[1])
             if count > config['accelerate stage-in']:
                 logger.info("Bypassing further access checks and using '{0}' for input".format(method))
                 config['input'] = [method]
@@ -639,7 +639,7 @@ def copy_outputs(data, config, env):
     data['output_storage_element'] = default_se
 
     if len(target_se) > 0:
-        data['output storager element'] = max(((se, target_se.count(se)) for se in set(target_se)), key=lambda (x, y): y)[0]
+        data['output storager element'] = max(((se, target_se.count(se)) for se in set(target_se)), key=lambda x_y1: x_y1[1])[0]
 
 
 def edit_process_source(pset, config):
@@ -832,7 +832,7 @@ def run_command(data, config, env):
         cmd.extend([str(arg) for arg in args])
     else:
         usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-        if isinstance(cmd, basestring):
+        if isinstance(cmd, str):
             cmd = shlex.split(cmd)
         if os.path.isfile(cmd[0]):
             cmd[0] = os.path.join(os.getcwd(), cmd[0])
@@ -856,7 +856,7 @@ def run_command(data, config, env):
         else:
             parse_fwk_report(data, config, 'report.xml', exitcode=p.returncode)
     else:
-        data['files']['info'] = dict((f, [0, []]) for f in config['file map'].values())
+        data['files']['info'] = dict((f, [0, []]) for f in list(config['file map'].values()))
         data['files']['output_info'] = dict((f, {'runs': {-1: [-1]}, 'events': 0, 'adler32': '0'}) for f, rf in config['output files'])
         data['cpu_time'] = usage.ru_stime
 
@@ -890,7 +890,7 @@ def run_epilogue(data, config, env):
     with open('report.json', 'r') as f:
         update = json.load(f)
         # Update data in memory without changing the reference
-        for k in update.keys():
+        for k in list(update.keys()):
             # List of allowed keys to update: currently only file metadata
             if k not in ('files',):
                 continue

@@ -43,7 +43,7 @@ class FileSystem(object):
             lasterror = None
             for imp in FileSystem._defaults:
                 try:
-                    return imp.fixresult(getattr(imp, attr)(*map(imp.lfn2pfn, args), **kwargs))
+                    return imp.fixresult(getattr(imp, attr)(*list(map(imp.lfn2pfn, args)), **kwargs))
                 except imp.errors as e:
                     logger.debug(
                         "method {0} of {1} failed with {2}, using args {3}, {4}".format(attr, imp, e, args, kwargs))
@@ -130,11 +130,11 @@ class StorageElement(object):
         def pfn2lfn(p):
             return p.replace(self._pfnprefix, '', 1)
 
-        if isinstance(res, basestring):
+        if isinstance(res, str):
             return pfn2lfn(res)
 
         try:
-            return map(pfn2lfn, res)
+            return list(map(pfn2lfn, res))
         except TypeError:
             return res
 
@@ -184,7 +184,7 @@ class Local(StorageElement):
             os.chmod(path, mode)
 
     def permissions(self, path):
-        return os.stat(path).st_mode & 0777
+        return os.stat(path).st_mode & 0o777
 
     def remove(self, *paths):
         for path in paths:
@@ -228,7 +228,7 @@ class Chirp(StorageElement):
             self.__c.chmod(str(path), mode)
 
     def permissions(self, path):
-        return self.__c.stat(str(path)).mode & 0777
+        return self.__c.stat(str(path)).mode & 0o777
 
     def remove(self, *paths):
         for path in paths:
@@ -430,11 +430,11 @@ class StorageConfiguration(Configurable):
         for e in doc.getElementsByTagName("lfn-to-pfn"):
             if e.attributes["protocol"].value != protocol:
                 continue
-            if 'destination-match' in e.attributes.keys() and \
+            if 'destination-match' in list(e.attributes.keys()) and \
                     not re.match(e.attributes['destination-match'].value, site):
                 continue
             if path and len(path) > 0 and \
-                    'path-match' in e.attributes.keys() and \
+                    'path-match' in list(e.attributes.keys()) and \
                     re.match(e.attributes['path-match'].value, path) is None:
                 continue
 

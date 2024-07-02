@@ -1,9 +1,9 @@
-from config import AdvancedOptions, Config
-from create import Algo
-from sandbox import Sandbox
-from task import TaskHandler, MergeTaskHandler
-from workflow import Category, Workflow
-from dataset import (
+from .config import AdvancedOptions, Config
+from .create import Algo
+from .sandbox import Sandbox
+from .task import TaskHandler, MergeTaskHandler
+from .workflow import Category, Workflow
+from .dataset import (
     Dataset, EmptyDataset, MultiGridpackDataset, MultiProductionDataset,
     ParentDataset, ParentMultiGridpackDataset, ProductionDataset)
 from lobster.se import StorageConfiguration

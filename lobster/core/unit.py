@@ -274,7 +274,7 @@ class UnitStore:
             if len(infos) < 25:
                 items = [(fn, infos[fn]) for fn in sorted(infos.keys())]
             else:
-                items = infos.items()
+                items = list(infos.items())
             for fn, info in items:
                 cur.execute(
                     """insert into files_{0}(units, events, filename, bytes) values (?, ?, ?, ?)""".format(
@@ -450,16 +450,16 @@ class UnitStore:
                 unit_update += [(task, id) for (id, file, run, lumi) in units]
                 for (id, filename) in files:
                     file_update[
-                        id] += len(filter(lambda tpl: tpl[1] == id, units))
+                        id] += len([tpl for tpl in units if tpl[1] == id])
 
             self.db.execute(
                 "update workflows set units_running=(units_running + ?) where id=?",
                 (len(workflow_update), workflow_id))
 
             self.db.executemany("update files_{0} set units_running=(units_running + ?) where id=?".format(workflow),
-                                [(v, k) for (k, v) in file_update.items()])
+                                [(v, k) for (k, v) in list(file_update.items())])
             self.db.executemany("update tasks set units=? where id=?",
-                                [(v, k) for (k, v) in task_update.items()])
+                                [(v, k) for (k, v) in list(task_update.items())])
             self.db.executemany("update units_{0} set status=1, task=? where id=?".format(workflow),
                                 unit_update)
 
@@ -487,7 +487,7 @@ class UnitStore:
         task_updates = []
 
         with self.db:
-            for ((dset, unit_source), updates) in taskinfos.items():
+            for ((dset, unit_source), updates) in list(taskinfos.items()):
                 file_updates = []
                 unit_updates = []
                 unit_fail_updates = []
@@ -543,7 +543,7 @@ class UnitStore:
                 TaskUpdate.sql_fragment(stop=-1))
             self.db.executemany(query, task_updates)
 
-            for label, _ in taskinfos.keys():
+            for label, _ in list(taskinfos.keys()):
                 self.update_workflow_stats(label)
 
     def update_workflow_stats_stuck(self, roots=None):
@@ -764,7 +764,7 @@ class UnitStore:
             if total is None:
                 total = row
             else:
-                total = map(sum, zip(total, row))
+                total = list(map(sum, list(zip(total, row))))
             if mergeable:
                 total_mergeable += unmasked
 
@@ -998,7 +998,7 @@ class UnitStore:
 
     def finished_files(self, infos):
         res = []
-        for label, files in infos.items():
+        for label, files in list(infos.items()):
             for i in range(0, len(files), 999):
                 chunk = list(files)[i:i + 999]
                 res.extend(

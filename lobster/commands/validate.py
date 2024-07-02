@@ -26,7 +26,7 @@ class Validate(Command):
                                                                   '# of uncleaned files',
                                                                   width=width))
         logger.info('-' * (66 + width))
-        for label, (fails, merges, uncleaned) in stats.items():
+        for label, (fails, merges, uncleaned) in list(stats.items()):
             if fails > 0 or merges > 0 or uncleaned > 0:
                 logger.info('{0:<{width}} {1:>20} {2:>20} {3:>23}'.format(label,
                                                                           fails,
@@ -36,9 +36,9 @@ class Validate(Command):
 
         logger.info('-' * (66 + width))
         logger.info('{0:<{width}} {1:>20} {2:>20} {3:>23}'.format('total',
-                                                                  sum(f for f, m, c in stats.values()),
-                                                                  sum(m for f, m, c in stats.values()),
-                                                                  sum(c for f, m, c in stats.values()),
+                                                                  sum(f for f, m, c in list(stats.values())),
+                                                                  sum(m for f, m, c in list(stats.values())),
+                                                                  sum(c for f, m, c in list(stats.values())),
                                                                   width=width))
 
     def process_workflow(self, store, stats, wflow):
@@ -98,7 +98,7 @@ class Validate(Command):
 
         logger.info('finished validating')
 
-        if sum(sum(stats.values(), [])) == 0:
+        if sum(sum(list(stats.values()), [])) == 0:
             logger.info('no files found to cleanup')
         else:
             self.print_stats(stats)

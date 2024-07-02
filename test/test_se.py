@@ -19,7 +19,7 @@ class TestSE(unittest.TestCase):
         if not os.path.exists(path):
             os.makedirs(path)
         cls.workdir = tempfile.mkdtemp(prefix=path)
-        os.chmod(cls.workdir, 0777)
+        os.chmod(cls.workdir, 0o777)
         os.makedirs(os.path.join(cls.workdir, 'spam'))
         for i in range(10):
             with open(os.path.join(cls.workdir, 'spam', str(i) + '.txt'), 'w') as f:

@@ -194,7 +194,7 @@ class Dataset(Configurable):
                         elif self.lumi_mask and ((run['run_num'], lumi) not in unmasked_lumis):
                             result.masked_units += 1
 
-        result.unmasked_units = sum([len(f.lumis) for f in result.files.values()])
+        result.unmasked_units = sum([len(f.lumis) for f in list(result.files.values())])
         result.total_units = result.unmasked_units + result.masked_units
 
         if not self.file_based:

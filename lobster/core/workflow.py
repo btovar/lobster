@@ -268,7 +268,7 @@ class Workflow(Configurable):
             return size
 
         orig = size
-        if isinstance(size, basestring):
+        if isinstance(size, str):
             unit = size[-1].lower()
             try:
                 size = float(size[:-1])
@@ -338,7 +338,7 @@ class Workflow(Configurable):
 
             return target
 
-        files = map(copy_file, self.extra_inputs)
+        files = list(map(copy_file, self.extra_inputs))
         self.extra_inputs = files
 
     def autosense(self, releases, basedirs, autoOutputs=False, autoGlobalTag=False):
@@ -383,7 +383,7 @@ class Workflow(Configurable):
         with open(util.findpath(basedirs, self.pset), 'r') as f:
             source = imp.load_source('cms_config_source', self.pset, f)
             process = source.process
-            for label, module in process.outputModules.items():
+            for label, module in list(process.outputModules.items()):
                 self.outputs.append(module.fileName.value().replace('file:', ''))
             if 'TFileService' in process.services:
                 self.outputs.append(process.services['TFileService'].fileName.value().replace('file:', ''))

@@ -287,7 +287,7 @@ class Process(Command, util.Timing):
                     # variables that way.  Any attempt to pass them
                     # through WQ will result in "env -i" wiping them
                     # out.                    
-                    cmd = 'env -i ' + ' '.join(['{}="{}"'.format(k,v) for k,v in env.items()]) + ' ' + cmd
+                    cmd = 'env -i ' + ' '.join(['{}="{}"'.format(k,v) for k,v in list(env.items())]) + ' ' + cmd
                     task = wq.Task(cmd)
                     task.specify_category(category)
                     task.specify_tag(id)

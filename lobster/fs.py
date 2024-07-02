@@ -3,6 +3,6 @@
 # to one instance of `se.FileSystem`.  This is done so that all python
 # files including `fs` within the same python process share one virtual
 # filesystem configuration.
-import se
+from . import se
 import sys
 sys.modules[__name__] = se.FileSystem()
