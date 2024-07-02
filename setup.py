@@ -13,7 +13,7 @@ setup(
     packages=[
         'lobster',
         'lobster.cmssw',
-        'lobster.cmssw.commands',
+        #'lobster.cmssw.commands',
         'lobster.core',
         'lobster.commands',
         'lobster.monitor',
@@ -35,20 +35,21 @@ setup(
     ]},
     install_requires=[
         'argparse',
-        'httplib2',  # actually a WMCore dependency
+        #'httplib2',  # actually a WMCore dependency
         'jinja2',
         'matplotlib',
         'nose',
         'numpy>=1.9',
         'psutil',
-        'python-cjson',  # actually a DBS dependency
+        #'python-cjson',  # actually a DBS dependency
         'python-daemon',
         'python-dateutil',
         'pytz',
         'pyxdg',
         'requests',
         'retrying',
-        'wmcore==1.1.1rc7'
+        #'wmcore==1.1.1rc7'
+        'wmcore'
     ],
     entry_points={
         'console_scripts': ['lobster = lobster.ui:boil']
