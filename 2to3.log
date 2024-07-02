@@ -1,0 +1,926 @@
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: No changes to lobster/setup.py
+RefactoringTool: Refactored lobster/docs/conf.py
+--- lobster/docs/conf.py	(original)
++++ lobster/docs/conf.py	(refactored)
+@@ -54,9 +54,9 @@
+ master_doc = 'index'
+ 
+ # General information about the project.
+-project = u'Lobster'
+-copyright = u'2013-2016, Anna Woodard, Matthias Wolf'
+-author = u'Anna Woodard, Matthias Wolf'
++project = 'Lobster'
++copyright = '2013-2016, Anna Woodard, Matthias Wolf'
++author = 'Anna Woodard, Matthias Wolf'
+ 
+ # The version info for the project you're documenting, acts as replacement for
+ # |version| and |release|, also used in various other places throughout the
+@@ -230,8 +230,8 @@
+ # (source start file, target name, title,
+ #  author, documentclass [howto, manual, or own class]).
+ latex_documents = [
+-  (master_doc, 'Lobster.tex', u'Lobster Documentation',
+-   u'Anna Woodard, Matthias Wolf', 'manual'),
++  (master_doc, 'Lobster.tex', 'Lobster Documentation',
++   'Anna Woodard, Matthias Wolf', 'manual'),
+ ]
+ 
+ # The name of an image file (relative to this directory) to place at the top of
+@@ -260,7 +260,7 @@
+ # One entry per manual page. List of tuples
+ # (source start file, name, description, authors, manual section).
+ man_pages = [
+-    (master_doc, 'lobster', u'Lobster Documentation',
++    (master_doc, 'lobster', 'Lobster Documentation',
+      [author], 1)
+ ]
+ 
+@@ -274,7 +274,7 @@
+ # (source start file, target name, title, author,
+ #  dir menu entry, description, category)
+ texinfo_documents = [
+-  (master_doc, 'Lobster', u'Lobster Documentation',
++  (master_doc, 'Lobster', 'Lobster Documentation',
+    author, 'Lobster', 'One line description of project.',
+    'Miscellaneous'),
+ ]
+RefactoringTool: No changes to lobster/examples/mc_gen.py
+RefactoringTool: No changes to lobster/examples/script.py
+RefactoringTool: No changes to lobster/examples/simple.py
+RefactoringTool: No changes to lobster/examples/simple_pset.py
+RefactoringTool: No changes to lobster/examples/mc_gen/HIG-RunIIFall15DR76-00243_1_cfg.py
+RefactoringTool: No changes to lobster/examples/mc_gen/HIG-RunIIFall15DR76-00243_2_cfg.py
+RefactoringTool: No changes to lobster/examples/mc_gen/HIG-RunIIFall15MiniAODv2-00224_1_cfg.py
+RefactoringTool: No changes to lobster/examples/mc_gen/HIG-RunIISummer15GS-00177_1_cfg.py
+RefactoringTool: No changes to lobster/examples/mc_gen/HIG-RunIIWinter15wmLHE-00196_1_cfg.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_16_patch1/python/Configuration/__init__.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_16_patch1/src/Configuration/GenProduction/python/HIG-RunIIWinter15wmLHE-00196-fragment.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_16_patch1/src/Configuration/GenProduction/python/__init__.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_18/python/Configuration/__init__.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/HIG-RunIIWinter15wmLHE-00196-fragment.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/__init__.py
+RefactoringTool: No changes to lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/ThirteenTeV/Higgs/Hadronizer_TuneCUETP8M1_13TeV_powhegEmissionVeto_3p_ttHToTT_M125_LHE_pythia8_cff.py
+RefactoringTool: No changes to lobster/lobster/actions.py
+RefactoringTool: Refactored lobster/lobster/fs.py
+--- lobster/lobster/fs.py	(original)
++++ lobster/lobster/fs.py	(refactored)
+@@ -3,6 +3,6 @@
+ # to one instance of `se.FileSystem`.  This is done so that all python
+ # files including `fs` within the same python process share one virtual
+ # filesystem configuration.
+-import se
++from . import se
+ import sys
+ sys.modules[__name__] = se.FileSystem()
+RefactoringTool: Refactored lobster/lobster/se.py
+--- lobster/lobster/se.py	(original)
++++ lobster/lobster/se.py	(refactored)
+@@ -43,7 +43,7 @@
+             lasterror = None
+             for imp in FileSystem._defaults:
+                 try:
+-                    return imp.fixresult(getattr(imp, attr)(*map(imp.lfn2pfn, args), **kwargs))
++                    return imp.fixresult(getattr(imp, attr)(*list(map(imp.lfn2pfn, args)), **kwargs))
+                 except imp.errors as e:
+                     logger.debug(
+                         "method {0} of {1} failed with {2}, using args {3}, {4}".format(attr, imp, e, args, kwargs))
+@@ -130,11 +130,11 @@
+         def pfn2lfn(p):
+             return p.replace(self._pfnprefix, '', 1)
+ 
+-        if isinstance(res, basestring):
++        if isinstance(res, str):
+             return pfn2lfn(res)
+ 
+         try:
+-            return map(pfn2lfn, res)
++            return list(map(pfn2lfn, res))
+         except TypeError:
+             return res
+ 
+@@ -184,7 +184,7 @@
+             os.chmod(path, mode)
+ 
+     def permissions(self, path):
+-        return os.stat(path).st_mode & 0777
++        return os.stat(path).st_mode & 0o777
+ 
+     def remove(self, *paths):
+         for path in paths:
+@@ -228,7 +228,7 @@
+             self.__c.chmod(str(path), mode)
+ 
+     def permissions(self, path):
+-        return self.__c.stat(str(path)).mode & 0777
++        return self.__c.stat(str(path)).mode & 0o777
+ 
+     def remove(self, *paths):
+         for path in paths:
+@@ -430,11 +430,11 @@
+         for e in doc.getElementsByTagName("lfn-to-pfn"):
+             if e.attributes["protocol"].value != protocol:
+                 continue
+-            if 'destination-match' in e.attributes.keys() and \
++            if 'destination-match' in list(e.attributes.keys()) and \
+                     not re.match(e.attributes['destination-match'].value, site):
+                 continue
+             if path and len(path) > 0 and \
+-                    'path-match' in e.attributes.keys() and \
++                    'path-match' in list(e.attributes.keys()) and \
+                     re.match(e.attributes['path-match'].value, path) is None:
+                 continue
+ 
+RefactoringTool: No changes to lobster/lobster/ui.py
+RefactoringTool: Refactored lobster/lobster/util.py
+--- lobster/lobster/util.py	(original)
++++ lobster/lobster/util.py	(refactored)
+@@ -77,7 +77,7 @@
+                         'class {} uses {} in the constructor, but does define it as property'.format(name, arg))
+         except Exception as e:
+             import sys
+-            raise type(e), type(e)('{0!s}: {1}'.format(cls, e.message)), sys.exc_info()[2]
++            raise type(e)(type(e)('{0!s}: {1}'.format(cls, e.message))).with_traceback(sys.exc_info()[2])
+         return res
+ 
+     @classmethod
+@@ -98,7 +98,7 @@
+         cls._actions.clear()
+ 
+ 
+-class Configurable(object):
++class Configurable(object, metaclass=PartiallyMutable):
+ 
+     """Partially mutable base object.
+ 
+@@ -110,7 +110,6 @@
+     passed, and a bool indicating if the changed object should be appended
+     to the arguments.
+     """
+-    __metaclass__ = PartiallyMutable
+     _mutable = {}
+ 
+     def __setattr__(self, attr, value):
+@@ -137,7 +136,7 @@
+ 
+     def __repr__(self, override=None):
+         argspec = inspect.getargspec(self.__init__)
+-        defaults = dict(zip(reversed(argspec.args), reversed(argspec.defaults)))
++        defaults = dict(list(zip(reversed(argspec.args), reversed(argspec.defaults))))
+         # Look for altered mutable properties, add them to constructor
+         # arguments
+         for arg in self._mutable:
+@@ -161,7 +160,7 @@
+             return repr(getattr(self, k))
+         args = ["\n    {},".format(indent(a)) for a in self.__args]
+         kwargs = ["\n    {}={}".format(k, indent(attr(k)))
+-                  for k, v in sorted(self.__kwargs.items(), key=lambda (x, y): x)]
++                  for k, v in sorted(list(self.__kwargs.items()), key=lambda x_y: x_y[0])]
+         s = self.__name + "({}\n)".format(",".join(args + kwargs))
+         return s
+ 
+@@ -258,9 +257,9 @@
+             if 'default' in defaults:
+                 for field in fields:
+                     setattr(self, field, defaults['default'])
+-            for field, value in defaults.items():
++            for field, value in list(defaults.items()):
+                 setattr(self, field, value)
+-            for field, value in kwargs.items():
++            for field, value in list(kwargs.items()):
+                 setattr(self, field, value)
+             for field, value in zip(fields, args):
+                 setattr(self, field, value)
+RefactoringTool: Refactored lobster/lobster/cmssw/__init__.py
+--- lobster/lobster/cmssw/__init__.py	(original)
++++ lobster/lobster/cmssw/__init__.py	(refactored)
+@@ -1,5 +1,5 @@
+-from dataset import Dataset
+-from proxy import Proxy
+-from sandbox import Sandbox
++from .dataset import Dataset
++from .proxy import Proxy
++from .sandbox import Sandbox
+ 
+ __all__ = ['Dataset', 'Proxy', 'Sandbox']
+RefactoringTool: Refactored lobster/lobster/cmssw/dataset.py
+--- lobster/lobster/cmssw/dataset.py	(original)
++++ lobster/lobster/cmssw/dataset.py	(refactored)
+@@ -194,7 +194,7 @@
+                         elif self.lumi_mask and ((run['run_num'], lumi) not in unmasked_lumis):
+                             result.masked_units += 1
+ 
+-        result.unmasked_units = sum([len(f.lumis) for f in result.files.values()])
++        result.unmasked_units = sum([len(f.lumis) for f in list(result.files.values())])
+         result.total_units = result.unmasked_units + result.masked_units
+ 
+         if not self.file_based:
+RefactoringTool: No changes to lobster/lobster/cmssw/proxy.py
+RefactoringTool: No changes to lobster/lobster/cmssw/sandbox.py
+RefactoringTool: No changes to lobster/lobster/commands/configuration.py
+RefactoringTool: No changes to lobster/lobster/commands/configure.py
+RefactoringTool: Refactored lobster/lobster/commands/plot.py
+--- lobster/lobster/commands/plot.py	(original)
++++ lobster/lobster/commands/plot.py	(refactored)
+@@ -69,13 +69,13 @@
+     """
+     keys = np.unique(a[col])
+     vals = [a[a[col] == v] for v in keys]
+-    keys = map(key, keys)
++    keys = list(map(key, keys))
+ 
+     if threshold:
+         total = float(len(a))
+-        others = filter(lambda v: len(v) / total < threshold, vals)
+-        keys, vals = zip(*filter(lambda (k, v): len(v) /
+-                                 total >= threshold, zip(keys, vals)))
++        others = [v for v in vals if len(v) / total < threshold]
++        keys, vals = list(zip(*[k_v for k_v in zip(keys, vals) if len(k_v[1]) /
++                                 total >= threshold]))
+         if len(others) > 0:
+             keys += ("Other", )
+             vals += (np.concatenate(others), )
+@@ -160,7 +160,7 @@
+     boxes = []
+     newlabels = []
+     for patch, text, label in zip(patches, texts, labels):
+-        if isinstance(label, basestring) and len(text.get_text()) == 0 and len(label) > 0:
++        if isinstance(label, str) and len(text.get_text()) == 0 and len(label) > 0:
+             boxes.append(patch)
+             newlabels.append(label)
+ 
+@@ -365,10 +365,10 @@
+                 var = np.std(y)
+                 med = np.median(y)
+                 stats[label] = (avg, var, med)
+-            info = u"{0}μ = {1:.3g}, σ = {2:.3g}, median = {3:.3g}"
++            info = "{0}μ = {1:.3g}, σ = {2:.3g}, median = {3:.3g}"
+             t = ax.text(0.75, 0.7,
+                         '\n'.join([info.format(label + ': ' if len(stats) > 1 else '', avg, var, med)
+-                                   for label, (avg, var, med) in stats.items()]),
++                                   for label, (avg, var, med) in list(stats.items())]),
+                         ha="center", va="center", transform=ax.transAxes, backgroundcolor='w')
+             t.set_bbox({'color': 'w', 'alpha': .5, 'edgecolor': 'w'})
+ 
+@@ -517,8 +517,7 @@
+                               'lobster_stats_{}.log'.format(category))
+ 
+         with open(fn) as f:
+-            headers = dict(map(lambda (a, b): (b, a),
+-                               enumerate(f.readline()[1:].split())))
++            headers = dict([(a_b[1], a_b[0]) for a_b in enumerate(f.readline()[1:].split())])
+         #stats = np.loadtxt(fn)
+         stats=np.genfromtxt(fn)
+ 
+@@ -778,7 +777,7 @@
+         ind = ind[np.argsort(errors[ind])]
+         failures = failures[ind][::-1]
+         table = [["All"] + list(failures)]
+-        for h, c in reversed(zip(hosts, counts)):
++        for h, c in reversed(list(zip(hosts, counts))):
+             host_tasks = failed_tasks[failed_tasks['host'] == h]
+             table.append(
+                 [h, c] + [len(host_tasks[host_tasks['exit_code'] == f]) for f in failures])
+@@ -823,7 +822,7 @@
+         return_stats = dict((label, diff('source_' + label)) for label in return_labels)
+ 
+         time_diff = ((times - np.roll(times, 1, 0)) * 1e6)[1:]
+-        everything = np.sum(lobster_stats.values(), axis=0)
++        everything = np.sum(list(lobster_stats.values()), axis=0)
+         other = time_diff - everything
+ 
+         self.plot(
+@@ -846,7 +845,7 @@
+         )
+         wq_stats['idle'] = (idle_total - np.roll(idle_total, 1, 0))[1:]
+ 
+-        everything = np.sum(wq_stats.values(), axis=0)
++        everything = np.sum(list(wq_stats.values()), axis=0)
+         other = lobster_stats['fetch'] - everything
+ 
+         self.plot(
+@@ -861,7 +860,7 @@
+             ymax=1.
+         )
+ 
+-        everything = np.sum(return_stats.values(), axis=0)
++        everything = np.sum(list(return_stats.values()), axis=0)
+         other = lobster_stats['return'] - everything
+ 
+         self.plot(
+@@ -961,7 +960,8 @@
+ 
+         if len(good_tasks) > 0:
+             def integrate_wall(q):
+-                def integrate((x, y)):
++                def integrate(xxx_todo_changeme):
++                    (x, y) = xxx_todo_changeme
+                     indices = np.logical_and(stats[:, 0] >= x, stats[:, 0] < y)
+                     values = stats[indices, headers[q]]
+                     if len(values) > 0:
+@@ -969,7 +969,7 @@
+                     return 0
+                 return integrate
+ 
+-            walltime = np.array(map(integrate_wall('committed_cores'), zip(edges[:-1], edges[1:])))
++            walltime = np.array(list(map(integrate_wall('committed_cores'), list(zip(edges[:-1], edges[1:])))))
+             cputime = self.updatecpu(success_tasks, edges)
+ 
+             centers = [(x + y) / 2 for x, y in zip(edges[:-1], edges[1:])]
+@@ -996,7 +996,7 @@
+                 modes=[Plotter.HIST | Plotter.TIME]
+             )
+ 
+-            walltime = np.array(map(integrate_wall('total_cores'), zip(edges[:-1], edges[1:])))
++            walltime = np.array(list(map(integrate_wall('total_cores'), list(zip(edges[:-1], edges[1:])))))
+             walltime[walltime == 0] = 1e-6
+ 
+             ratio = np.nan_to_num(np.divide(cputime * 1.0, walltime))
+@@ -1249,7 +1249,7 @@
+                  for xs in fail_values],
+                 'Failed tasks', os.path.join(subdir, 'failed-tasks'),
+                 modes=[Plotter.HIST | Plotter.TIME],
+-                label=map(str, fail_labels)
++                label=list(map(str, fail_labels))
+             )
+ 
+             self.plot(
+@@ -1330,7 +1330,7 @@
+ 
+             data = []
+             labels = []
+-            for label, (headers, stats) in self.__category_stats.items():
++            for label, (headers, stats) in list(self.__category_stats.items()):
+                 data.append((stats[:, headers['timestamp']],
+                              stats[:, headers['tasks_running']]))
+                 labels.append(label)
+@@ -1378,7 +1378,7 @@
+             for dirpath, dirnames, filenames in os.walk(logdir):
+                 logs = [os.path.join(dirpath, fn)
+                         for fn in filenames if fn.endswith('.log')]
+-                map(os.unlink, logs)
++                list(map(os.unlink, logs))
+         else:
+             os.makedirs(logdir)
+ 
+@@ -1408,8 +1408,8 @@
+             ).encode('utf-8'))
+ 
+         def add_total(summaries):
+-            numbers = zip(*[s[1:-2] for s in summaries])
+-            total = map(sum, numbers)
++            numbers = list(zip(*[s[1:-2] for s in summaries]))
++            total = list(map(sum, numbers))
+             total_mergeable = sum([s[-9] for s in summaries if
+                                    getattr(self.config.workflows, s[0], None) and
+                                    getattr(self.config.workflows, s[0]).merge_size > 0])
+RefactoringTool: Refactored lobster/lobster/commands/process.py
+--- lobster/lobster/commands/process.py	(original)
++++ lobster/lobster/commands/process.py	(refactored)
+@@ -287,7 +287,7 @@
+                     # variables that way.  Any attempt to pass them
+                     # through WQ will result in "env -i" wiping them
+                     # out.                    
+-                    cmd = 'env -i ' + ' '.join(['{}="{}"'.format(k,v) for k,v in env.items()]) + ' ' + cmd
++                    cmd = 'env -i ' + ' '.join(['{}="{}"'.format(k,v) for k,v in list(env.items())]) + ' ' + cmd
+                     task = wq.Task(cmd)
+                     task.specify_category(category)
+                     task.specify_tag(id)
+RefactoringTool: Refactored lobster/lobster/commands/status.py
+--- lobster/lobster/commands/status.py	(original)
++++ lobster/lobster/commands/status.py	(refactored)
+@@ -25,8 +25,8 @@
+             data.insert(i, [x[i] if len(x) > i else '' for x in headers])
+ 
+         widths = \
+-            [max(map(len, (xs[0] for xs in data)))] + \
+-            [max(map(len, (str(xs[i]) for xs in data)))
++            [max(list(map(len, (xs[0] for xs in data))))] + \
++            [max(list(map(len, (str(xs[i]) for xs in data))))
+              for i in range(1, len(data[0]))]
+         data.insert(header_rows, ['=' * w for w in widths])
+         headfmt = ' '.join('{{:^{0}}}'.format(w) for w in widths)
+@@ -34,7 +34,7 @@
+             widths[0]) + ' '.join('{{:>{0}}}'.format(w) for w in widths[1:])
+         report = '\n'.join(
+             [headfmt.format(*data[i]) for i in range(0, header_rows)] +
+-            [mainfmt.format(*map(str, row)) for row in data[header_rows:]])
++            [mainfmt.format(*list(map(str, row))) for row in data[header_rows:]])
+ 
+         logger.info("workflow summary:\n" + report)
+ 
+RefactoringTool: Refactored lobster/lobster/commands/validate.py
+--- lobster/lobster/commands/validate.py	(original)
++++ lobster/lobster/commands/validate.py	(refactored)
+@@ -26,7 +26,7 @@
+                                                                   '# of uncleaned files',
+                                                                   width=width))
+         logger.info('-' * (66 + width))
+-        for label, (fails, merges, uncleaned) in stats.items():
++        for label, (fails, merges, uncleaned) in list(stats.items()):
+             if fails > 0 or merges > 0 or uncleaned > 0:
+                 logger.info('{0:<{width}} {1:>20} {2:>20} {3:>23}'.format(label,
+                                                                           fails,
+@@ -36,9 +36,9 @@
+ 
+         logger.info('-' * (66 + width))
+         logger.info('{0:<{width}} {1:>20} {2:>20} {3:>23}'.format('total',
+-                                                                  sum(f for f, m, c in stats.values()),
+-                                                                  sum(m for f, m, c in stats.values()),
+-                                                                  sum(c for f, m, c in stats.values()),
++                                                                  sum(f for f, m, c in list(stats.values())),
++                                                                  sum(m for f, m, c in list(stats.values())),
++                                                                  sum(c for f, m, c in list(stats.values())),
+                                                                   width=width))
+ 
+     def process_workflow(self, store, stats, wflow):
+@@ -98,7 +98,7 @@
+ 
+         logger.info('finished validating')
+ 
+-        if sum(sum(stats.values(), [])) == 0:
++        if sum(sum(list(stats.values()), [])) == 0:
+             logger.info('no files found to cleanup')
+         else:
+             self.print_stats(stats)
+RefactoringTool: Refactored lobster/lobster/core/__init__.py
+--- lobster/lobster/core/__init__.py	(original)
++++ lobster/lobster/core/__init__.py	(refactored)
+@@ -1,9 +1,9 @@
+-from config import AdvancedOptions, Config
+-from create import Algo
+-from sandbox import Sandbox
+-from task import TaskHandler, MergeTaskHandler
+-from workflow import Category, Workflow
+-from dataset import (
++from .config import AdvancedOptions, Config
++from .create import Algo
++from .sandbox import Sandbox
++from .task import TaskHandler, MergeTaskHandler
++from .workflow import Category, Workflow
++from .dataset import (
+     Dataset, EmptyDataset, MultiGridpackDataset, MultiProductionDataset,
+     ParentDataset, ParentMultiGridpackDataset, ProductionDataset)
+ from lobster.se import StorageConfiguration
+RefactoringTool: Refactored lobster/lobster/core/command.py
+--- lobster/lobster/core/command.py	(original)
++++ lobster/lobster/core/command.py	(refactored)
+@@ -19,15 +19,13 @@
+                 name = os.path.basename(fn)[:-3]
+                 imp.load_source(name, fn)
+         subparsers = parser.add_subparsers(title='commands')
+-        for name, plugin in sorted(cls.plugins.items(), key=lambda (x, y): x):
++        for name, plugin in sorted(list(cls.plugins.items()), key=lambda x_y: x_y[0]):
+             parser = subparsers.add_parser(name, help=plugin.help)
+             plugin.setup(parser)
+             parser.set_defaults(plugin=plugin)
+ 
+ 
+-class Command(object):
+-    __metaclass__ = CommandRegistry
+-
++class Command(object, metaclass=CommandRegistry):
+     @abstractproperty
+     def help(self):
+         pass
+RefactoringTool: Refactored lobster/lobster/core/config.py
+--- lobster/lobster/core/config.py	(original)
++++ lobster/lobster/core/config.py	(refactored)
+@@ -130,7 +130,7 @@
+                 cfg.storage.activate(failures=False)
+                 return cfg
+         except IOError as e:
+-            print e
++            print(e)
+             raise IOError("can't load configuration from {0}".format(
+                 os.path.join(path, 'config.pkl')))
+ 
+RefactoringTool: Refactored lobster/lobster/core/create.py
+--- lobster/lobster/core/create.py	(original)
++++ lobster/lobster/core/create.py	(refactored)
+@@ -74,7 +74,7 @@
+         """
+         # Remaining workload
+         workloads = defaultdict(int)
+-        for wflow, (complete, units, tasks) in remaining.items():
++        for wflow, (complete, units, tasks) in list(remaining.items()):
+             if not complete and tasks < 1.:
+                 logger.debug("workflow {} has not enough units available to form new tasks".format(wflow.label))
+                 continue
+@@ -93,7 +93,7 @@
+ 
+         # contains (workflow label, tasks, taper)
+         data = []
+-        for wflow, (complete, units, tasks) in remaining.items():
++        for wflow, (complete, units, tasks) in list(remaining.items()):
+             if not complete and tasks < 1. or units == 0:
+                 continue
+             task_cores = wflow.category.cores or 1
+RefactoringTool: No changes to lobster/lobster/core/dataset.py
+RefactoringTool: No changes to lobster/lobster/core/sandbox.py
+RefactoringTool: Refactored lobster/lobster/core/source.py
+--- lobster/lobster/core/source.py	(original)
++++ lobster/lobster/core/source.py	(refactored)
+@@ -56,7 +56,7 @@
+             self.__exe[status] = [taskid]
+ 
+     def wq(self, status, taskid):
+-        for flag in ReleaseSummary.flags.keys():
++        for flag in list(ReleaseSummary.flags.keys()):
+             if status == flag:
+                 try:
+                     self.__wq[flag].append(taskid)
+@@ -468,7 +468,7 @@
+                         logger.error("error removing {0}:\n{1}".format(task.tag, e))
+ 
+         with self.measure('propagate'):
+-            for label, infos in propagate.items():
++            for label, infos in list(propagate.items()):
+                 unique_args = getattr(self.config.workflows, label).unique_arguments
+                 self.__store.register_files(infos, label, unique_args)
+ 
+RefactoringTool: Refactored lobster/lobster/core/task.py
+--- lobster/lobster/core/task.py	(original)
++++ lobster/lobster/core/task.py	(refactored)
+@@ -7,7 +7,7 @@
+ 
+ from lobster import util
+ from lobster.core.dataset import FileInfo
+-import unit
++from . import unit
+ 
+ from WMCore.DataStructs.LumiList import LumiList
+ 
+@@ -44,7 +44,7 @@
+     @property
+     def output_info(self):
+         res = FileInfo()
+-        for run, lumis in self._output_info.get('runs', {-1: [-1]}).items():
++        for run, lumis in list(self._output_info.get('runs', {-1: [-1]}).items()):
+             res.lumis += [(int(run), lumi) for lumi in lumis]
+         res.events = self._output_info.get('events', 0)
+         res.size = self._output_size
+@@ -122,7 +122,7 @@
+             data = json.load(f)
+ 
+             if len(data['files']['output_info']) > 0:
+-                self._output_info = data['files']['output_info'].values()[0]
++                self._output_info = list(data['files']['output_info'].values())[0]
+                 self._output_size = data['output_size']
+ 
+             task_update.bytes_output = data['output_size']
+RefactoringTool: Refactored lobster/lobster/core/unit.py
+--- lobster/lobster/core/unit.py	(original)
++++ lobster/lobster/core/unit.py	(refactored)
+@@ -274,7 +274,7 @@
+             if len(infos) < 25:
+                 items = [(fn, infos[fn]) for fn in sorted(infos.keys())]
+             else:
+-                items = infos.items()
++                items = list(infos.items())
+             for fn, info in items:
+                 cur.execute(
+                     """insert into files_{0}(units, events, filename, bytes) values (?, ?, ?, ?)""".format(
+@@ -450,16 +450,16 @@
+                 unit_update += [(task, id) for (id, file, run, lumi) in units]
+                 for (id, filename) in files:
+                     file_update[
+-                        id] += len(filter(lambda tpl: tpl[1] == id, units))
++                        id] += len([tpl for tpl in units if tpl[1] == id])
+ 
+             self.db.execute(
+                 "update workflows set units_running=(units_running + ?) where id=?",
+                 (len(workflow_update), workflow_id))
+ 
+             self.db.executemany("update files_{0} set units_running=(units_running + ?) where id=?".format(workflow),
+-                                [(v, k) for (k, v) in file_update.items()])
++                                [(v, k) for (k, v) in list(file_update.items())])
+             self.db.executemany("update tasks set units=? where id=?",
+-                                [(v, k) for (k, v) in task_update.items()])
++                                [(v, k) for (k, v) in list(task_update.items())])
+             self.db.executemany("update units_{0} set status=1, task=? where id=?".format(workflow),
+                                 unit_update)
+ 
+@@ -487,7 +487,7 @@
+         task_updates = []
+ 
+         with self.db:
+-            for ((dset, unit_source), updates) in taskinfos.items():
++            for ((dset, unit_source), updates) in list(taskinfos.items()):
+                 file_updates = []
+                 unit_updates = []
+                 unit_fail_updates = []
+@@ -543,7 +543,7 @@
+                 TaskUpdate.sql_fragment(stop=-1))
+             self.db.executemany(query, task_updates)
+ 
+-            for label, _ in taskinfos.keys():
++            for label, _ in list(taskinfos.keys()):
+                 self.update_workflow_stats(label)
+ 
+     def update_workflow_stats_stuck(self, roots=None):
+@@ -764,7 +764,7 @@
+             if total is None:
+                 total = row
+             else:
+-                total = map(sum, zip(total, row))
++                total = list(map(sum, list(zip(total, row))))
+             if mergeable:
+                 total_mergeable += unmasked
+ 
+@@ -998,7 +998,7 @@
+ 
+     def finished_files(self, infos):
+         res = []
+-        for label, files in infos.items():
++        for label, files in list(infos.items()):
+             for i in range(0, len(files), 999):
+                 chunk = list(files)[i:i + 999]
+                 res.extend(
+RefactoringTool: Refactored lobster/lobster/core/workflow.py
+--- lobster/lobster/core/workflow.py	(original)
++++ lobster/lobster/core/workflow.py	(refactored)
+@@ -268,7 +268,7 @@
+             return size
+ 
+         orig = size
+-        if isinstance(size, basestring):
++        if isinstance(size, str):
+             unit = size[-1].lower()
+             try:
+                 size = float(size[:-1])
+@@ -338,7 +338,7 @@
+ 
+             return target
+ 
+-        files = map(copy_file, self.extra_inputs)
++        files = list(map(copy_file, self.extra_inputs))
+         self.extra_inputs = files
+ 
+     def autosense(self, releases, basedirs, autoOutputs=False, autoGlobalTag=False):
+@@ -383,7 +383,7 @@
+         with open(util.findpath(basedirs, self.pset), 'r') as f:
+             source = imp.load_source('cms_config_source', self.pset, f)
+             process = source.process
+-            for label, module in process.outputModules.items():
++            for label, module in list(process.outputModules.items()):
+                 self.outputs.append(module.fileName.value().replace('file:', ''))
+             if 'TFileService' in process.services:
+                 self.outputs.append(process.services['TFileService'].fileName.value().replace('file:', ''))
+RefactoringTool: No changes to lobster/lobster/core/data/merge_cfg.py
+RefactoringTool: Refactored lobster/lobster/core/data/merge_reports.py
+--- lobster/lobster/core/data/merge_reports.py	(original)
++++ lobster/lobster/core/data/merge_reports.py	(refactored)
+@@ -3,24 +3,24 @@
+ import sys
+ 
+ if len(sys.argv) < 3:
+-    print "usage: {0} output inputs...".format(sys.argv[0])
++    print("usage: {0} output inputs...".format(sys.argv[0]))
+     sys.exit(1)
+ 
+ with open(sys.argv[1], 'r') as f:
+     data = json.load(f)
+ 
+ mergedfiles = data['files']['info']
+-mergedkeys = dict((os.path.basename(k), k) for k in mergedfiles.keys())
++mergedkeys = dict((os.path.basename(k), k) for k in list(mergedfiles.keys()))
+ 
+ data['files']['info'] = {}
+ 
+ for fn in sys.argv[2:]:
+-    print ">> merging {0}".format(fn)
++    print(">> merging {0}".format(fn))
+ 
+     with open(fn, 'r') as f:
+         report = json.load(f)
+ 
+-    for (ifn, (events, lumis)) in report['files']['info'].items():
++    for (ifn, (events, lumis)) in list(report['files']['info'].items()):
+         try:
+             data['files']['info'][ifn][0] += events
+             data['files']['info'][ifn][1].extend(lumis)
+RefactoringTool: Refactored lobster/lobster/core/data/task.py
+--- lobster/lobster/core/data/task.py	(original)
++++ lobster/lobster/core/data/task.py	(refactored)
+@@ -198,7 +198,7 @@
+     """Try to calculate checksums for output files.
+     """
+ 
+-    for fn in data['files']['output_info'].keys():
++    for fn in list(data['files']['output_info'].keys()):
+         checksum = '0'
+         try:
+             p = subprocess.Popen(['edmFileUtil', '-a', fn], stdout=subprocess.PIPE)
+@@ -249,7 +249,7 @@
+                         logger.debug(l)
+                 data['task_exit_code'] = ecode
+                 data.update(update)
+-                logger.error("call to '{}' failed, exiting with exit code {}".format(fct.func_name, ecode))
++                logger.error("call to '{}' failed, exiting with exit code {}".format(fct.__name__, ecode))
+                 sys.exit(ecode)
+             finally:
+                 if timing:
+@@ -511,7 +511,7 @@
+         successes[input] += 1
+ 
+         if config.get('accelerate stage-in', 0) > 0 and not fast_track:
+-            method, count = max(successes.items(), key=lambda (x, y): y)
++            method, count = max(list(successes.items()), key=lambda x_y: x_y[1])
+             if count > config['accelerate stage-in']:
+                 logger.info("Bypassing further access checks and using '{0}' for input".format(method))
+                 config['input'] = [method]
+@@ -639,7 +639,7 @@
+     data['output_storage_element'] = default_se
+ 
+     if len(target_se) > 0:
+-        data['output storager element'] = max(((se, target_se.count(se)) for se in set(target_se)), key=lambda (x, y): y)[0]
++        data['output storager element'] = max(((se, target_se.count(se)) for se in set(target_se)), key=lambda x_y1: x_y1[1])[0]
+ 
+ 
+ def edit_process_source(pset, config):
+@@ -832,7 +832,7 @@
+         cmd.extend([str(arg) for arg in args])
+     else:
+         usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+-        if isinstance(cmd, basestring):
++        if isinstance(cmd, str):
+             cmd = shlex.split(cmd)
+         if os.path.isfile(cmd[0]):
+             cmd[0] = os.path.join(os.getcwd(), cmd[0])
+@@ -856,7 +856,7 @@
+         else:
+             parse_fwk_report(data, config, 'report.xml', exitcode=p.returncode)
+     else:
+-        data['files']['info'] = dict((f, [0, []]) for f in config['file map'].values())
++        data['files']['info'] = dict((f, [0, []]) for f in list(config['file map'].values()))
+         data['files']['output_info'] = dict((f, {'runs': {-1: [-1]}, 'events': 0, 'adler32': '0'}) for f, rf in config['output files'])
+         data['cpu_time'] = usage.ru_stime
+ 
+@@ -890,7 +890,7 @@
+     with open('report.json', 'r') as f:
+         update = json.load(f)
+         # Update data in memory without changing the reference
+-        for k in update.keys():
++        for k in list(update.keys()):
+             # List of allowed keys to update: currently only file metadata
+             if k not in ('files',):
+                 continue
+RefactoringTool: Refactored lobster/test/count_events.py
+--- lobster/test/count_events.py	(original)
++++ lobster/test/count_events.py	(refactored)
+@@ -28,16 +28,16 @@
+         events[path][index] = (r, b, e)
+ 
+         if args.verbose and index % 5000 == 0:
+-            print '>>>> entry run lumi event: {:10} {:10} {:10} {:10}'.format(index, r, b, e)
++            print('>>>> entry run lumi event: {:10} {:10} {:10} {:10}'.format(index, r, b, e))
+ 
+         if index == args.max:
+             break
+ 
+     unique = len(np.unique(events[path])) - 1
+ 
+-    print 'found {} ({} unique) run, lumi, event sets in {} files in path {}'.format(index + 1, unique, len(files), path)
++    print('found {} ({} unique) run, lumi, event sets in {} files in path {}'.format(index + 1, unique, len(files), path))
+ 
+ if len(args.paths) > 1:
+     for first, second in itertools.permutations(args.paths, 2):
+         diff = np.setdiff1d(events[first], events[second])
+-        print 'path {} has {} events which are not in {}'.format(first, len(diff), second)
++        print('path {} has {} events which are not in {}'.format(first, len(diff), second))
+RefactoringTool: Refactored lobster/test/test_cms_backend.py
+--- lobster/test/test_cms_backend.py	(original)
++++ lobster/test/test_cms_backend.py	(refactored)
+@@ -58,7 +58,7 @@
+         for fn in ['/test/{0}.root'.format(i) for i in range(files)]:
+             info.files[fn].lumis = [(-1, -1)]
+ 
+-        info.total_units = len(info.files.keys())
++        info.total_units = len(list(info.files.keys()))
+         info.path = ''
+ 
+         return Workflow(label, None, command="foo"), info
+@@ -75,7 +75,7 @@
+         file_events = 0
+         file_lumis = []
+ 
+-        events = map(list, enumerate([lumi_events] * lumis))
++        events = list(map(list, enumerate([lumi_events] * lumis)))
+         while len(events) > 0:
+             (lumi, size) = events[0]
+ 
+@@ -107,7 +107,7 @@
+             info.files[f].events = file_events
+             info.files[f].lumis = file_lumis
+ 
+-        lumis = sum([finfo.lumis for finfo in info.files.values()], [])
++        lumis = sum([finfo.lumis for finfo in list(info.files.values())], [])
+         info.total_units = len(lumis)
+         total_lumis = len(set(lumis))
+         info.stop_on_file_boundary = (total_lumis != info.total_units)
+@@ -122,7 +122,7 @@
+         total = 0
+ 
+         assert len(info.files) == 5
+-        for fn, finfo in info.files.items():
++        for fn, finfo in list(info.files.items()):
+             total += finfo.events
+             assert len(finfo.lumis) == 3
+         assert total == 1100
+@@ -138,7 +138,7 @@
+         handler = TaskHandler(123, 'test_handler', files, lumis, 'test', True)
+ 
+         files_info = {
+-            u'/test/0.root': (220, [(1, 1), (1, 2), (1, 3)])
++            '/test/0.root': (220, [(1, 1), (1, 2), (1, 3)])
+         }
+         files_skipped = []
+         events_written = 123
+RefactoringTool: No changes to lobster/test/test_cmssw_sandbox.py
+RefactoringTool: No changes to lobster/test/test_core_data_task.py
+RefactoringTool: Refactored lobster/test/test_core_dataset.py
+--- lobster/test/test_core_dataset.py	(original)
++++ lobster/test/test_core_dataset.py	(refactored)
+@@ -17,7 +17,7 @@
+         if not os.path.exists(path):
+             os.makedirs(path)
+         cls.workdir = tempfile.mkdtemp(prefix=path)
+-        os.chmod(cls.workdir, 0777)
++        os.chmod(cls.workdir, 0o777)
+         os.makedirs(os.path.join(cls.workdir, 'eggs'))
+         for i in range(10):
+             with open(os.path.join(cls.workdir, 'eggs', str(i) + '.txt'), 'w') as f:
+RefactoringTool: No changes to lobster/test/test_core_task.py
+RefactoringTool: Refactored lobster/test/test_se.py
+--- lobster/test/test_se.py	(original)
++++ lobster/test/test_se.py	(refactored)
+@@ -19,7 +19,7 @@
+         if not os.path.exists(path):
+             os.makedirs(path)
+         cls.workdir = tempfile.mkdtemp(prefix=path)
+-        os.chmod(cls.workdir, 0777)
++        os.chmod(cls.workdir, 0o777)
+         os.makedirs(os.path.join(cls.workdir, 'spam'))
+         for i in range(10):
+             with open(os.path.join(cls.workdir, 'spam', str(i) + '.txt'), 'w') as f:
+RefactoringTool: Files that need to be modified:
+RefactoringTool: lobster/setup.py
+RefactoringTool: lobster/docs/conf.py
+RefactoringTool: lobster/examples/mc_gen.py
+RefactoringTool: lobster/examples/script.py
+RefactoringTool: lobster/examples/simple.py
+RefactoringTool: lobster/examples/simple_pset.py
+RefactoringTool: lobster/examples/mc_gen/HIG-RunIIFall15DR76-00243_1_cfg.py
+RefactoringTool: lobster/examples/mc_gen/HIG-RunIIFall15DR76-00243_2_cfg.py
+RefactoringTool: lobster/examples/mc_gen/HIG-RunIIFall15MiniAODv2-00224_1_cfg.py
+RefactoringTool: lobster/examples/mc_gen/HIG-RunIISummer15GS-00177_1_cfg.py
+RefactoringTool: lobster/examples/mc_gen/HIG-RunIIWinter15wmLHE-00196_1_cfg.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_16_patch1/python/Configuration/__init__.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_16_patch1/src/Configuration/GenProduction/python/HIG-RunIIWinter15wmLHE-00196-fragment.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_16_patch1/src/Configuration/GenProduction/python/__init__.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_18/python/Configuration/__init__.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/HIG-RunIIWinter15wmLHE-00196-fragment.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/__init__.py
+RefactoringTool: lobster/examples/mc_gen/CMSSW_7_1_18/src/Configuration/GenProduction/python/ThirteenTeV/Higgs/Hadronizer_TuneCUETP8M1_13TeV_powhegEmissionVeto_3p_ttHToTT_M125_LHE_pythia8_cff.py
+RefactoringTool: lobster/lobster/actions.py
+RefactoringTool: lobster/lobster/fs.py
+RefactoringTool: lobster/lobster/se.py
+RefactoringTool: lobster/lobster/ui.py
+RefactoringTool: lobster/lobster/util.py
+RefactoringTool: lobster/lobster/cmssw/__init__.py
+RefactoringTool: lobster/lobster/cmssw/dataset.py
+RefactoringTool: lobster/lobster/cmssw/proxy.py
+RefactoringTool: lobster/lobster/cmssw/sandbox.py
+RefactoringTool: lobster/lobster/commands/configuration.py
+RefactoringTool: lobster/lobster/commands/configure.py
+RefactoringTool: lobster/lobster/commands/plot.py
+RefactoringTool: lobster/lobster/commands/process.py
+RefactoringTool: lobster/lobster/commands/status.py
+RefactoringTool: lobster/lobster/commands/validate.py
+RefactoringTool: lobster/lobster/core/__init__.py
+RefactoringTool: lobster/lobster/core/command.py
+RefactoringTool: lobster/lobster/core/config.py
+RefactoringTool: lobster/lobster/core/create.py
+RefactoringTool: lobster/lobster/core/dataset.py
+RefactoringTool: lobster/lobster/core/sandbox.py
+RefactoringTool: lobster/lobster/core/source.py
+RefactoringTool: lobster/lobster/core/task.py
+RefactoringTool: lobster/lobster/core/unit.py
+RefactoringTool: lobster/lobster/core/workflow.py
+RefactoringTool: lobster/lobster/core/data/merge_cfg.py
+RefactoringTool: lobster/lobster/core/data/merge_reports.py
+RefactoringTool: lobster/lobster/core/data/task.py
+RefactoringTool: lobster/test/count_events.py
+RefactoringTool: lobster/test/test_cms_backend.py
+RefactoringTool: lobster/test/test_cmssw_sandbox.py
+RefactoringTool: lobster/test/test_core_data_task.py
+RefactoringTool: lobster/test/test_core_dataset.py
+RefactoringTool: lobster/test/test_core_task.py
+RefactoringTool: lobster/test/test_se.py
+RefactoringTool: Warnings/messages while refactoring:
+RefactoringTool: ### In file lobster/lobster/commands/plot.py ###
+RefactoringTool: Line 1381: You should use a for loop here

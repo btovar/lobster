@@ -6,3 +6,4 @@ Session.vim
 Lobster.egg-info
 dist/
 build/
+.DS_Store
