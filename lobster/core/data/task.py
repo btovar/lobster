@@ -22,7 +22,7 @@ import xml.dom.minidom
 
 sys.path.append('python')
 
-from WMCore.DataStructs.LumiList import LumiList
+from lobster.WMCore.DataStructs.LumiList import LumiList
 from WMCore.FwkJobReport.Report import Report
 from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig
 
