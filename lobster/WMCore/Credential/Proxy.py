@@ -59,7 +59,7 @@ def destroyListCred( credNameList = [], credTimeleftList = { }, logger = None, t
     """
     cleanCredCmdList = []
 
-    for credIdx in xrange(len(credNameList)):
+    for credIdx in range(len(credNameList)):
         hours, minutes, seconds = credTimeleftList[ credIdx ]
         timeleft = int(hours) * 3600 + int(minutes) * 60 + int(seconds)
         if timeleft == 0:
@@ -725,7 +725,7 @@ class Proxy(Credential):
                                              self.commandTimeout)
         if retcode == 0:
             if allAttributes:
-                return filter(bool, attribute.split('\n'))
+                return list(filter(bool, attribute.split('\n')))
             else:
                 return attribute.split('\n')[0]
         else:
