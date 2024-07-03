@@ -18,7 +18,18 @@ from lobster.core import unit
 from lobster.core import Algo
 from lobster.core import MergeTaskHandler
 
-from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+
+# disable site config during py2 to py3 transition
+enable_wmcore = False
+if enable_wmcore:
+    from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+else:
+    class SiteConfigError(Exception):
+        pass
+
+    def loadSiteLocalConfig(*args, **kwargs):
+        raise SiteConfigError()
+
 
 logger = logging.getLogger('lobster.source')
 
