@@ -264,8 +264,9 @@ class Workflow(Configurable):
         return Configurable.__repr__(self, override)
 
     def __check_merge(self, size):
-        if size <= 0:
-            return size
+        # @TODO find python3 version of this check
+        #if size <= 0:
+        #    return size
 
         orig = size
         if isinstance(size, str):

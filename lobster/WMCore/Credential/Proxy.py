@@ -13,6 +13,8 @@ from datetime import datetime
 import time
 from hashlib import sha1
 
+from lobster.WMCore.Credential.Credential import Credential
+
 
 def execute_command( command, logger, timeout, redirect = True ):
     """
