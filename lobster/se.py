@@ -249,12 +249,13 @@ class XrootD(StorageElement):
             protocol, server, path = url_re.match(path).groups()
             args = ['xrdfs', server] + cmds + [path]
             try:
-                p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={})
-                pout, err = p.communicate()
+                # p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={})
+                # pout, err = p.communicate()
+                p = subprocess.run(args, capture_output=True, text=True)
                 if p.returncode != 0 and not kwargs.get('safe', False):
                     msg = "Failed to execute '{0}':\n{1}\n{2}".format(' '.join(args), err, pout)
                     raise IOError(msg)
-                output.append(pout)
+                output.append(p.stdout)
             except OSError:
                 raise AttributeError("xrd utilities not available")
         return '/n'.join(output)
