@@ -13,7 +13,6 @@ setup(
     packages=[
         'lobster',
         'lobster.cmssw',
-        'lobster.cmssw.commands',
         'lobster.core',
         'lobster.commands',
         'lobster.monitor',
