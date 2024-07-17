@@ -22,7 +22,7 @@ from lobster.core import MergeTaskHandler
 # disable site config during py2 to py3 transition
 enable_wmcore = False
 if enable_wmcore:
-    from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+    from lobster.WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
 else:
     class SiteConfigError(Exception):
         pass
