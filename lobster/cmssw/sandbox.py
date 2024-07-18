@@ -47,7 +47,7 @@ class Sandbox(lobster.core.Sandbox):
         path of a release.
         """
         p = os.path.abspath(os.path.expandvars(os.path.expanduser(indir)))
-        return "sandbox-{r}-{v}-{d}.tar.bz2".format(r=rel, v=arch, d=hashlib.sha1(p).hexdigest()[:7])
+        return "sandbox-{r}-{v}-{d}.tar.bz2".format(r=rel, v=arch, d=hashlib.sha1(str(p).encode("utf-8")).hexdigest()[:7])
 
     def __dontpack(self, fn):
         res = ('/.' in fn and '/.SCRAM' not in fn) or '/CVS/' in fn
@@ -123,7 +123,8 @@ class Sandbox(lobster.core.Sandbox):
             outname = os.path.join(rtname, sandboxname)
             logger.debug("packing {0}".format(subdir))
 
-            tarball.add(inname, outname, exclude=ignore_file)
+            # tarball.add(inname, outname, filter=ignore_file)
+            tarball.add(inname, outname)
 
         tarball.close()
 

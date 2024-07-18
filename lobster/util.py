@@ -350,11 +350,11 @@ def verify(workdir):
         return
 
     my_version = get_version()
-    major, head, status = my_version.split('-')
+    major, head, status = my_version.split('+')
     my_version = major
 
     stored_version = checkpoint(workdir, 'version')
-    major, head, status = stored_version.split('-')
+    major, head, status = stored_version.split('+')
     stored_version = major
 
     if stored_version != my_version:
@@ -408,7 +408,7 @@ def get_version():
             head = subprocess.check_output(shlex.split('git rev-parse --short HEAD')).strip().decode('ascii')
             diff = subprocess.check_output(shlex.split('git diff'))
             status = 'dirty' if diff else 'clean'
-            version = '{major}+{head}-{status}'.format(major=VERSION, head=head, status=status)
+            version = '{major}+{head}+{status}'.format(major=VERSION, head=head, status=status)
         except subprocess.CalledProcessError:
             version = VERSION
         finally:
