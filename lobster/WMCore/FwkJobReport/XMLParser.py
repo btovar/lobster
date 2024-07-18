@@ -9,9 +9,9 @@ from __future__ import division, print_function
 import logging
 import re
 
-from WMCore.Algorithms.ParseXMLFile import coroutine, xmlFileToNode
-from WMCore.DataStructs.Run import Run
-from WMCore.FwkJobReport import Report
+from lobster.WMCore.Algorithms.ParseXMLFile import coroutine, xmlFileToNode
+from lobster.WMCore.DataStructs.Run import Run
+from lobster.WMCore.FwkJobReport import Report
 
 
 pat_int = re.compile(r'(^[0-9-]$|^[0-9-][0-9]*$)')
