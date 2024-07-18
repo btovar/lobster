@@ -162,7 +162,7 @@ class TaskProvider(util.Timing):
         if create:
             self.taskid = 'lobster_{0}_{1}'.format(
                 self.config.label,
-                sha1(str(datetime.datetime.utcnow())).hexdigest()[-16:])
+                sha1(str(datetime.datetime.utcnow()).encode('utf-8')).hexdigest()[-16:])
             util.register_checkpoint(self.workdir, 'id', self.taskid)
             shutil.copy(self.config.base_configuration, os.path.join(self.workdir, 'config.py'))
         else:
@@ -265,7 +265,7 @@ class TaskProvider(util.Timing):
 
         # Files to make the task wrapper work without referencing WMCore
         # from somewhere else
-        import WMCore
+        import lobster.WMCore as WMCore
         base = os.path.dirname(WMCore.__file__)
         reqs = [
             "__init__.py",
