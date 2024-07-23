@@ -48,8 +48,7 @@ setup(
         'pyxdg',
         'requests',
         'retrying',
-        #'wmcore==1.1.1rc7'
-        'wmcore'
+        #'wmcore==1.1.1rc7'  # wmcore has deps we can't resolve, so we're adding the needed classes to lobster
     ],
     entry_points={
         'console_scripts': ['lobster = lobster.ui:boil']

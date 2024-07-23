@@ -399,6 +399,8 @@ def sendemail(emailmsg, config):
 
 
 def get_version():
+    # @TODO the version string needs to change for the latest setuptools and python 3.10
+    # https://peps.python.org/pep-0440/
     if 'site-packages' in __file__:
         version = get_distribution('Lobster').version
     else:

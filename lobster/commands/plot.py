@@ -865,9 +865,9 @@ class Plotter(object):
 
         self.plot(
             [
-                (centers, np.divide(return_stats[label], everything)) for label in return_labels
+                (centers, np.divide(return_stats[label], everything)) for label in return_labels # @TODO error: RuntimeWarning: invalid value encountered in divide
             ] + [
-                (centers, np.divide(other, everything))
+                (centers, np.divide(other, everything)) # @TODO error: RuntimeWarning: invalid value encountered in divide
             ],
             'Return fraction', os.path.join(category, 'return-fraction'),
             modes=[Plotter.STACK | Plotter.TIME],
@@ -1391,7 +1391,8 @@ class Plotter(object):
 
         labels = [w.label for w in self.config.workflows]
 
-        with open(os.path.join(self.__plotdir, 'all', 'index.html'), 'w') as f:
+        # the render() call below is returning bytes instead of str, so we'll write the data in raw mode
+        with open(os.path.join(self.__plotdir, 'all', 'index.html'), 'wb') as f:
             f.write(wflow.render(
                 id=self.config.label,
                 label='all workflows',
@@ -1452,7 +1453,7 @@ class Plotter(object):
             summary = add_total([xs for xs in summary_data if xs[0] in labels])
             category_summary_data.append([label] + summary[-1][1:])
 
-            with open(os.path.join(self.__plotdir, label, 'index.html'), 'w') as f:
+            with open(os.path.join(self.__plotdir, label, 'index.html'), 'wb') as f:
                 f.write(wflow.render(
                     id=self.config.label,
                     label=label,
@@ -1470,7 +1471,7 @@ class Plotter(object):
 
         # Add the total from the unit store query
         category_summary_data.append(summary_data[-1])
-        with open(os.path.join(self.__plotdir, 'index.html'), 'w') as f:
+        with open(os.path.join(self.__plotdir, 'index.html'), 'wb') as f:
             f.write(overview.render(
                 id=self.config.label,
                 plot_time=time.time(),
