@@ -94,7 +94,7 @@ def unpack(arg):
             logger.info("skipping {0}".format(source))
             return
         logger.info("unpacking {0}".format(source))
-        with open(target, 'w') as output:
+        with open(target, 'wb') as output:  # 2to3 conversion manual fix, make read/write modes match
             input = gzip.open(source, 'rb')
             output.writelines(input)
             input.close()
