@@ -7,8 +7,8 @@
 #
 # If optional packages are needed, they should be included in the function
 # scope.
-
 import collections
+collections.MutableSequence = collections.abc.MutableSequence  # workaround for python 3.10
 import inspect
 import json
 import logging

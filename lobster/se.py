@@ -8,8 +8,8 @@ import xml.dom.minidom
 from contextlib import contextmanager
 from lobster.util import Configurable
 
-import Chirp as chirp
-
+# import Chirp as chirp
+import ndcctools.chirp as chirp  # change to this for more recent versions of cctools, e.g 7.11.1
 
 logger = logging.getLogger('lobster.se')
 

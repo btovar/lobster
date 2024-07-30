@@ -39,7 +39,7 @@ matplotlib.rc('figure', figsize=(8, 1.5))
 matplotlib.rc('figure.subplot', left=0.09, right=0.96, bottom=0.275)
 matplotlib.rc('hatch', linewidth=.3)
 matplotlib.rc('font', size=7)
-matplotlib.rc('font', **{'sans-serif': 'Liberation Sans', 'family': 'sans-serif'})
+# matplotlib.rc('font', **{'sans-serif': 'Liberation Sans', 'family': 'sans-serif'})
 
 logger = logging.getLogger('lobster.plotting')
 

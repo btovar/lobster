@@ -266,9 +266,10 @@ class TaskProvider(util.Timing):
         # Files to make the task wrapper work without referencing WMCore
         # from somewhere else
         import lobster.WMCore as WMCore
-        base = os.path.dirname(WMCore.__file__)
+        #base = os.path.dirname(WMCore.__file__)
+        base = os.path.join(os.path.dirname(__file__), "..", "WMCore")
         reqs = [
-            "__init__.py",
+            #"__init__.py",
             "Algorithms",
             "Configuration.py",
             "DataStructs",
