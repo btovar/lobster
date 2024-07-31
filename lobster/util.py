@@ -23,7 +23,7 @@ from contextlib import contextmanager
 from email.mime.text import MIMEText
 from pkg_resources import get_distribution
 
-VERSION = "1.9"
+VERSION = "2.0a1"
 
 logger = logging.getLogger('lobster.util')
 
@@ -350,11 +350,11 @@ def verify(workdir):
         return
 
     my_version = get_version()
-    major, head, status = my_version.split('+')
+    major, minor, micro = my_version.split('.')
     my_version = major
 
     stored_version = checkpoint(workdir, 'version')
-    major, head, status = stored_version.split('+')
+    major, minor, micro = stored_version.split('.')
     stored_version = major
 
     if stored_version != my_version:
@@ -399,7 +399,6 @@ def sendemail(emailmsg, config):
 
 
 def get_version():
-    # @TODO the version string needs to change for the latest setuptools and python 3.10
     # https://peps.python.org/pep-0440/
     if 'site-packages' in __file__:
         version = get_distribution('Lobster').version
@@ -410,7 +409,10 @@ def get_version():
             head = subprocess.check_output(shlex.split('git rev-parse --short HEAD')).strip().decode('ascii')
             diff = subprocess.check_output(shlex.split('git diff'))
             status = 'dirty' if diff else 'clean'
-            version = '{major}+{head}+{status}'.format(major=VERSION, head=head, status=status)
+            #version = '{major}+{head}'.format(major=VERSION, head=head)
+            version = str(VERSION)
+            if status == 'dirty':
+                version += '+{local}'.format(local=head)
         except subprocess.CalledProcessError:
             version = VERSION
         finally:

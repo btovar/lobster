@@ -39,7 +39,7 @@ setup(
         'jinja2',
         'matplotlib',
         'nose',
-        'numpy>=1.9',
+        'numpy>=1.26',
         'psutil',
         #'python-cjson',  # actually a DBS dependency
         'python-daemon',
