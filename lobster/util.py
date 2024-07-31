@@ -350,11 +350,11 @@ def verify(workdir):
         return
 
     my_version = get_version()
-    major, minor, micro = my_version.split('.')
+    major, minor = my_version.split('.')
     my_version = major
 
     stored_version = checkpoint(workdir, 'version')
-    major, minor, micro = stored_version.split('.')
+    major, minor = stored_version.split('.')
     stored_version = major
 
     if stored_version != my_version:
