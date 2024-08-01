@@ -29,6 +29,7 @@ dependencies:
   - future=0.18.3
   - icu=73.2
   - idna=3.7
+  - jinja2
   - jsonpatch=1.33
   - jsonpointer=3.0.0
   - keyutils=1.6.1
@@ -64,8 +65,10 @@ dependencies:
   - lzo=2.10
   - mamba=1.5.8
   - markdown-it-py=2.2.0
+  - matplolib
   - mdurl=0.1.0
   - menuinst=2.1.1
+  - nose
   - ncurses=6.5
   - ndcctools=7.11.1
   - numpy=1.26.4
@@ -74,17 +77,23 @@ dependencies:
   - pip=24.0
   - platformdirs=4.2.2
   - pluggy=1.5.0
+  - psutil
   - pybind11-abi=4
   - pycosat=0.6.6
   - pycparser=2.22
   - pygments=2.15.1
   - pysocks=1.7.1
+  - python-daemon
+  - python-dateutil
   - python=3.10.14
   - python_abi=3.10=4_cp310
+  - pytz
+  - pyxdg
   - readline=8.2
   - reproc=14.2.4.post0
   - reproc-cpp=14.2.4.post0
   - requests=2.32.3
+  - retrying
   - rich=13.7.1
   - ruamel.yaml=0.18.6
   - ruamel.yaml.clib=0.2.8

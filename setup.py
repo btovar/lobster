@@ -34,20 +34,8 @@ setup(
         'commands/data/category.html',
     ]},
     install_requires=[
-        'argparse',
         #'httplib2',  # actually a WMCore dependency
-        'jinja2',
-        'matplotlib',
-        'nose',
-        'numpy>=1.26',
-        'psutil',
         #'python-cjson',  # actually a DBS dependency
-        'python-daemon',
-        'python-dateutil',
-        'pytz',
-        'pyxdg',
-        'requests',
-        'retrying',
         #'wmcore==1.1.1rc7'  # wmcore has deps we can't resolve, so we're adding the needed classes to lobster
     ],
     entry_points={
