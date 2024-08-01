@@ -65,7 +65,7 @@ dependencies:
   - lzo=2.10
   - mamba=1.5.8
   - markdown-it-py=2.2.0
-  - matplolib
+  - matplotlib
   - mdurl=0.1.0
   - menuinst=2.1.1
   - nose
