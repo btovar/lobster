@@ -17,7 +17,12 @@ import copy
 import itertools
 import json
 import re
-import urllib.request, urllib.error, urllib.parse
+#import urllib.request, urllib.error, urllib.parse
+# This will get run from python2 and python3, so we need to handle the urllib import
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 class LumiList(object):
     """
@@ -60,7 +65,8 @@ class LumiList(object):
             self.compactList = json.load(jsonFile)
         elif url:
             self.url = url
-            jsonFile = urllib.request.urlopen(url)
+            # jsonFile = urllib.request.urlopen(url)
+            jsonFile = urlopen(url)
             self.compactList = json.load(jsonFile)
         elif lumis:
             runsAndLumis = {}
