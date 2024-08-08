@@ -58,7 +58,7 @@ class TestSQLBackend(object):
         for fn in ['/test/{0}.root'.format(i) for i in range(files)]:
             info.files[fn].lumis = [(-1, -1)]
 
-        info.total_units = len(info.files.keys())
+        info.total_units = len(list(info.files.keys()))
         info.path = ''
 
         return Workflow(label, None, command="foo"), info
@@ -75,7 +75,7 @@ class TestSQLBackend(object):
         file_events = 0
         file_lumis = []
 
-        events = map(list, enumerate([lumi_events] * lumis))
+        events = list(map(list, enumerate([lumi_events] * lumis)))
         while len(events) > 0:
             (lumi, size) = events[0]
 
@@ -107,7 +107,7 @@ class TestSQLBackend(object):
             info.files[f].events = file_events
             info.files[f].lumis = file_lumis
 
-        lumis = sum([finfo.lumis for finfo in info.files.values()], [])
+        lumis = sum([finfo.lumis for finfo in list(info.files.values())], [])
         info.total_units = len(lumis)
         total_lumis = len(set(lumis))
         info.stop_on_file_boundary = (total_lumis != info.total_units)
@@ -122,7 +122,7 @@ class TestSQLBackend(object):
         total = 0
 
         assert len(info.files) == 5
-        for fn, finfo in info.files.items():
+        for fn, finfo in list(info.files.items()):
             total += finfo.events
             assert len(finfo.lumis) == 3
         assert total == 1100
@@ -138,7 +138,7 @@ class TestSQLBackend(object):
         handler = TaskHandler(123, 'test_handler', files, lumis, 'test', True)
 
         files_info = {
-            u'/test/0.root': (220, [(1, 1), (1, 2), (1, 3)])
+            '/test/0.root': (220, [(1, 1), (1, 2), (1, 3)])
         }
         files_skipped = []
         events_written = 123

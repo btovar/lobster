@@ -12,8 +12,8 @@ from lobster.core.dataset import DatasetInfo
 from lobster.util import Configurable
 
 from dbs.apis.dbsClient import DbsApi
-from WMCore.Credential.Proxy import Proxy
-from WMCore.DataStructs.LumiList import LumiList
+from lobster.WMCore.Credential.Proxy import Proxy
+from lobster.WMCore.DataStructs.LumiList import LumiList
 
 logger = logging.getLogger('lobster.cmssw.dataset')
 
@@ -194,7 +194,7 @@ class Dataset(Configurable):
                         elif self.lumi_mask and ((run['run_num'], lumi) not in unmasked_lumis):
                             result.masked_units += 1
 
-        result.unmasked_units = sum([len(f.lumis) for f in result.files.values()])
+        result.unmasked_units = sum([len(f.lumis) for f in list(result.files.values())])
         result.total_units = result.unmasked_units + result.masked_units
 
         if not self.file_based:

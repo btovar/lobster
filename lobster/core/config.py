@@ -130,7 +130,7 @@ class Config(Configurable):
                 cfg.storage.activate(failures=False)
                 return cfg
         except IOError as e:
-            print e
+            print(e)
             raise IOError("can't load configuration from {0}".format(
                 os.path.join(path, 'config.pkl')))
 

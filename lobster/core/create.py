@@ -74,7 +74,7 @@ class Algo(object):
         """
         # Remaining workload
         workloads = defaultdict(int)
-        for wflow, (complete, units, tasks) in remaining.items():
+        for wflow, (complete, units, tasks) in list(remaining.items()):
             if not complete and tasks < 1.:
                 logger.debug("workflow {} has not enough units available to form new tasks".format(wflow.label))
                 continue
@@ -93,7 +93,7 @@ class Algo(object):
 
         # contains (workflow label, tasks, taper)
         data = []
-        for wflow, (complete, units, tasks) in remaining.items():
+        for wflow, (complete, units, tasks) in list(remaining.items()):
             if not complete and tasks < 1. or units == 0:
                 continue
             task_cores = wflow.category.cores or 1

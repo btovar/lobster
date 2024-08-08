@@ -19,15 +19,13 @@ class CommandRegistry(ABCMeta):
                 name = os.path.basename(fn)[:-3]
                 imp.load_source(name, fn)
         subparsers = parser.add_subparsers(title='commands')
-        for name, plugin in sorted(cls.plugins.items(), key=lambda (x, y): x):
+        for name, plugin in sorted(list(cls.plugins.items()), key=lambda x_y: x_y[0]):
             parser = subparsers.add_parser(name, help=plugin.help)
             plugin.setup(parser)
             parser.set_defaults(plugin=plugin)
 
 
-class Command(object):
-    __metaclass__ = CommandRegistry
-
+class Command(object, metaclass=CommandRegistry):
     @abstractproperty
     def help(self):
         pass

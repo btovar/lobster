@@ -16,6 +16,7 @@ setup(
         'lobster.core',
         'lobster.commands',
         'lobster.monitor',
+        'lobster.WMCore',
     ],
     package_data={'lobster': [
         'core/data/autosense.sh',
@@ -33,21 +34,9 @@ setup(
         'commands/data/category.html',
     ]},
     install_requires=[
-        'argparse',
-        'httplib2',  # actually a WMCore dependency
-        'jinja2',
-        'matplotlib',
-        'nose',
-        'numpy>=1.9',
-        'psutil',
-        'python-cjson',  # actually a DBS dependency
-        'python-daemon',
-        'python-dateutil',
-        'pytz',
-        'pyxdg',
-        'requests',
-        'retrying',
-        'wmcore==1.1.1rc7'
+        #'httplib2',  # actually a WMCore dependency
+        #'python-cjson',  # actually a DBS dependency
+        #'wmcore==1.1.1rc7'  # wmcore has deps we can't resolve, so we're adding the needed classes to lobster
     ],
     entry_points={
         'console_scripts': ['lobster = lobster.ui:boil']

@@ -18,7 +18,18 @@ from lobster.core import unit
 from lobster.core import Algo
 from lobster.core import MergeTaskHandler
 
-from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+
+# disable site config during py2 to py3 transition
+enable_wmcore = True
+if enable_wmcore:
+    from lobster.WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+else:
+    class SiteConfigError(Exception):
+        pass
+
+    def loadSiteLocalConfig(*args, **kwargs):
+        raise SiteConfigError()
+
 
 logger = logging.getLogger('lobster.source')
 
@@ -56,7 +67,7 @@ class ReleaseSummary(object):
             self.__exe[status] = [taskid]
 
     def wq(self, status, taskid):
-        for flag in ReleaseSummary.flags.keys():
+        for flag in list(ReleaseSummary.flags.keys()):
             if status == flag:
                 try:
                     self.__wq[flag].append(taskid)
@@ -151,7 +162,7 @@ class TaskProvider(util.Timing):
         if create:
             self.taskid = 'lobster_{0}_{1}'.format(
                 self.config.label,
-                sha1(str(datetime.datetime.utcnow())).hexdigest()[-16:])
+                sha1(str(datetime.datetime.utcnow()).encode('utf-8')).hexdigest()[-16:])
             util.register_checkpoint(self.workdir, 'id', self.taskid)
             shutil.copy(self.config.base_configuration, os.path.join(self.workdir, 'config.py'))
         else:
@@ -249,26 +260,30 @@ class TaskProvider(util.Timing):
             (os.path.join(os.path.dirname(__file__), 'data', 'wrapper.sh'), 'wrapper.sh', True),
             (os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True),
             (os.path.join(os.path.dirname(__file__), 'data', 'report.json.in'), 'report.json.in', True),
+            (os.path.join(os.path.dirname(__file__), '..', '__init__.py'), os.path.join('lobster', '__init__.py'), True),
             (self.parrot_bin, 'bin', True),
         ]
 
         # Files to make the task wrapper work without referencing WMCore
         # from somewhere else
-        import WMCore
-        base = os.path.dirname(WMCore.__file__)
+        import lobster.WMCore as WMCore
+        #base = os.path.dirname(WMCore.__file__)
+        base = os.path.join(os.path.dirname(__file__), "..", "WMCore")
         reqs = [
             "__init__.py",
             "Algorithms",
+            "Credential",
             "Configuration.py",
             "DataStructs",
             "FwkJobReport",
             "Services",
             "Storage",
+            "Utils",
             "WMException.py",
             "WMExceptions.py"
         ]
         for f in reqs:
-            self._inputs.append((os.path.join(base, f), os.path.join("python", "WMCore", f), True))
+            self._inputs.append((os.path.join(base, f), os.path.join("lobster", "WMCore", f), True))
 
         if 'X509_USER_PROXY' in os.environ:
             self._inputs.append((os.environ['X509_USER_PROXY'], 'proxy', False))
@@ -468,7 +483,7 @@ class TaskProvider(util.Timing):
                         logger.error("error removing {0}:\n{1}".format(task.tag, e))
 
         with self.measure('propagate'):
-            for label, infos in propagate.items():
+            for label, infos in list(propagate.items()):
                 unique_args = getattr(self.config.workflows, label).unique_arguments
                 self.__store.register_files(infos, label, unique_args)
 

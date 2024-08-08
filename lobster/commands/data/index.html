@@ -8,7 +8,7 @@
 
         {% macro label_wrapper(img_name, label) %}
         <li><a class="workflow" href="{{ img_name }}"><img alt="{{ label }}"
-                    {% for k, v in kwargs.iteritems() %}
+                    {% for k, v in kwargs.items() %}
                         {{ k }}="{{ v }}"
                     {% endfor %}
                 src="{{ img_name }}"/>

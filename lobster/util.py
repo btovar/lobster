@@ -7,8 +7,8 @@
 #
 # If optional packages are needed, they should be included in the function
 # scope.
-
 import collections
+collections.MutableSequence = collections.abc.MutableSequence  # workaround for python 3.10
 import inspect
 import json
 import logging
@@ -23,7 +23,7 @@ from contextlib import contextmanager
 from email.mime.text import MIMEText
 from pkg_resources import get_distribution
 
-VERSION = "1.9"
+VERSION = "2.0a1"
 
 logger = logging.getLogger('lobster.util')
 
@@ -77,7 +77,7 @@ class PartiallyMutable(type):
                         'class {} uses {} in the constructor, but does define it as property'.format(name, arg))
         except Exception as e:
             import sys
-            raise type(e), type(e)('{0!s}: {1}'.format(cls, e.message)), sys.exc_info()[2]
+            raise type(e)(type(e)('{0!s}: {1}'.format(cls, e.message))).with_traceback(sys.exc_info()[2])
         return res
 
     @classmethod
@@ -98,7 +98,7 @@ class PartiallyMutable(type):
         cls._actions.clear()
 
 
-class Configurable(object):
+class Configurable(object, metaclass=PartiallyMutable):
 
     """Partially mutable base object.
 
@@ -110,7 +110,6 @@ class Configurable(object):
     passed, and a bool indicating if the changed object should be appended
     to the arguments.
     """
-    __metaclass__ = PartiallyMutable
     _mutable = {}
 
     def __setattr__(self, attr, value):
@@ -137,7 +136,7 @@ class Configurable(object):
 
     def __repr__(self, override=None):
         argspec = inspect.getargspec(self.__init__)
-        defaults = dict(zip(reversed(argspec.args), reversed(argspec.defaults)))
+        defaults = dict(list(zip(reversed(argspec.args), reversed(argspec.defaults))))
         # Look for altered mutable properties, add them to constructor
         # arguments
         for arg in self._mutable:
@@ -161,7 +160,7 @@ class Configurable(object):
             return repr(getattr(self, k))
         args = ["\n    {},".format(indent(a)) for a in self.__args]
         kwargs = ["\n    {}={}".format(k, indent(attr(k)))
-                  for k, v in sorted(self.__kwargs.items(), key=lambda (x, y): x)]
+                  for k, v in sorted(list(self.__kwargs.items()), key=lambda x_y: x_y[0])]
         s = self.__name + "({}\n)".format(",".join(args + kwargs))
         return s
 
@@ -258,9 +257,9 @@ def record(cls, *fields, **defaults):
             if 'default' in defaults:
                 for field in fields:
                     setattr(self, field, defaults['default'])
-            for field, value in defaults.items():
+            for field, value in list(defaults.items()):
                 setattr(self, field, value)
-            for field, value in kwargs.items():
+            for field, value in list(kwargs.items()):
                 setattr(self, field, value)
             for field, value in zip(fields, args):
                 setattr(self, field, value)
@@ -351,11 +350,11 @@ def verify(workdir):
         return
 
     my_version = get_version()
-    major, head, status = my_version.split('-')
+    major, minor = my_version.split('.')
     my_version = major
 
     stored_version = checkpoint(workdir, 'version')
-    major, head, status = stored_version.split('-')
+    major, minor = stored_version.split('.')
     stored_version = major
 
     if stored_version != my_version:
@@ -400,16 +399,20 @@ def sendemail(emailmsg, config):
 
 
 def get_version():
+    # https://peps.python.org/pep-0440/
     if 'site-packages' in __file__:
         version = get_distribution('Lobster').version
     else:
         start = os.getcwd()
         os.chdir(os.path.dirname(__file__))
         try:
-            head = subprocess.check_output(shlex.split('git rev-parse --short HEAD')).strip()
+            head = subprocess.check_output(shlex.split('git rev-parse --short HEAD')).strip().decode('ascii')
             diff = subprocess.check_output(shlex.split('git diff'))
             status = 'dirty' if diff else 'clean'
-            version = '{major}-{head}-{status}'.format(major=VERSION, head=head, status=status)
+            #version = '{major}+{head}'.format(major=VERSION, head=head)
+            version = str(VERSION)
+            if status == 'dirty':
+                version += '+{local}'.format(local=head)
         except subprocess.CalledProcessError:
             version = VERSION
         finally:

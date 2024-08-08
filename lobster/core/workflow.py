@@ -264,11 +264,12 @@ class Workflow(Configurable):
         return Configurable.__repr__(self, override)
 
     def __check_merge(self, size):
-        if size <= 0:
-            return size
+        # @TODO find python3 version of this check
+        #if size <= 0:
+        #    return size
 
         orig = size
-        if isinstance(size, basestring):
+        if isinstance(size, str):
             unit = size[-1].lower()
             try:
                 size = float(size[:-1])
@@ -338,7 +339,7 @@ class Workflow(Configurable):
 
             return target
 
-        files = map(copy_file, self.extra_inputs)
+        files = list(map(copy_file, self.extra_inputs))
         self.extra_inputs = files
 
     def autosense(self, releases, basedirs, autoOutputs=False, autoGlobalTag=False):
@@ -383,7 +384,7 @@ class Workflow(Configurable):
         with open(util.findpath(basedirs, self.pset), 'r') as f:
             source = imp.load_source('cms_config_source', self.pset, f)
             process = source.process
-            for label, module in process.outputModules.items():
+            for label, module in list(process.outputModules.items()):
                 self.outputs.append(module.fileName.value().replace('file:', ''))
             if 'TFileService' in process.services:
                 self.outputs.append(process.services['TFileService'].fileName.value().replace('file:', ''))
@@ -493,7 +494,7 @@ class Workflow(Configurable):
             inputs.append((box, cleaned, True))
         if merge:
             inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'merge_reports.py'), 'merge_reports.py', True))
-            inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True))
+            # inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True))  # redundant to source.py
             inputs.extend((r, "_".join(os.path.normpath(r).split(os.sep)[-3:]), False) for r in reports)
 
             cmd = self.merge_command

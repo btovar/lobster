@@ -17,7 +17,7 @@ class TestDataset(unittest.TestCase):
         if not os.path.exists(path):
             os.makedirs(path)
         cls.workdir = tempfile.mkdtemp(prefix=path)
-        os.chmod(cls.workdir, 0777)
+        os.chmod(cls.workdir, 0o777)
         os.makedirs(os.path.join(cls.workdir, 'eggs'))
         for i in range(10):
             with open(os.path.join(cls.workdir, 'eggs', str(i) + '.txt'), 'w') as f:
