@@ -494,7 +494,7 @@ class Workflow(Configurable):
             inputs.append((box, cleaned, True))
         if merge:
             inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'merge_reports.py'), 'merge_reports.py', True))
-            inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True))
+            # inputs.append((os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True))  # redundant to source.py
             inputs.extend((r, "_".join(os.path.normpath(r).split(os.sep)[-3:]), False) for r in reports)
 
             cmd = self.merge_command
