@@ -53,6 +53,12 @@ In the lobster repository, there is a python script called "simple.py". This has
 3. in the lobster/examples directory, do:  `lobster process simple.py`
 4. in the same directory, start a work_queue_factory with the following command: `/afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos rhel7 > /tmp/${USER}_factory.log`
 
+To run using python2 lobster on rhel9 machines, use the following command: 
+```
+nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.1.0 -S /tmp/wq-$USER-factory > /tmp/${USER}_factory.log &
+```
+
+
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
 
