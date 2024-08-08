@@ -830,7 +830,11 @@ class UnitStore:
                 self.maxsize = maxsize
 
             def __cmp__(self, other):
-                return cmp(self.size, other.size)
+                #return cmp(self.size, other.size)  #this was a python2 function
+                return self.size == other.size  # for python3 this should work
+            
+            def __eq__(self, other):  # this overloads the == operator
+                return self.size == other.size
 
             def add(self, task, units, size):
                 if self.size + size > self.maxsize:

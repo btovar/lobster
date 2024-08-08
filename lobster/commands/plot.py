@@ -139,12 +139,13 @@ def mp_pie(vals, labels, name, plotdir=None, **kwargs):
         ax.set_prop_cycle(monochrome)
 
     newlabels = []
-    total = sum(vals)
-    for label, val in zip(labels, vals):
-        if float(val) / total < .025:
-            newlabels.append('')
-        else:
-            newlabels.append(label)
+    total = sum(vals)  # total == 0 causes division error
+    if total != 0:
+        for label, val in zip(labels, vals):
+            if float(val) / total < .025:
+                newlabels.append('')
+            else:
+                newlabels.append(label)
 
     with open(os.path.join(plotdir, name + '.dat'), 'w') as f:
         for l, v in zip(labels, vals):
@@ -286,7 +287,7 @@ def mp_plot(a, xlabel, stub=None, ylabel='tasks', bins=50, modes=None, ymax=None
                 if '/' not in ylabel:
                     ax.set_ylabel('{} / {:.0f} min'.format(ylabel,
                                                            (bins[1] - bins[0]) * 24 * 60.))
-            else:
+            elif float('inf') not in a:  # error passing inf to hist
                 ax.hist([y for (x, y) in a], bins=bins,
                         histtype='stepfilled', stacked=True, **kwargs)
         elif mode & Plotter.PROF:
