@@ -46,6 +46,8 @@ In the lobster repository, there is a python script called "simple.py". This has
 3. in the lobster/examples directory, do:  `lobster process simple.py`
 4. in the same directory, start a work_queue_factory with the following command: `work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log`
 
+If the process is unable to write to disk and needs a scratch directory add the `-S` or `--scratch-dir` flag with a path to a temp folder.  
+The lobster working folder works fine for this, e.g. `/tmpscratch/users/$USER/lobster_test_` + datetime.  
 
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
@@ -65,5 +67,6 @@ After submitting a lobster process and starting a work_queue_factory, if there a
 - Kill the current work_queue_factory. 
 - Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log &`
 
-If that does not result in workers being spawned, you can try running a worker directly:
+If that does not result in workers being spawned, you can try running a worker directly with the following command, where path_to_your_conda_env  
+is the base path where all the conda packages for your environment are installed, e.g. `$HOME/miniconda3/envs/base`:
 - `apptainer exec --bind /cvmfs:/cvmfs --bind <path_to_your_conda_env>:/cctools /afs/crc.nd.edu/group/ccl/software/runos/images/cc7-wq-7.11.1.img /cctools/bin/work_queue_worker -M "lobster_$USER.*" -dall --cores 1 --disk 10000 -t 150`
