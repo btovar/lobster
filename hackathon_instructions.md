@@ -1,62 +1,50 @@
 # Lobster Conda Environment Setup
 **Lobster now uses conda, never do cmsenv**
 
-First login to earth, and then run the following commands. 
+First login to glados, and then run the following commands. 
 The general directory structure is: 
 ```
-lobster-with-conda
-    DBS
+lobster-python3
     lobster
 ``` 
 If you'd like to use a different setup, just adjust the paths accordingly.
 ```
 unset PYTHONPATH
 
-mkdir lobster-with-conda
-cd lobster-with-conda
+mkdir lobster-python3
+cd lobster-python3
 
 git clone https://github.com/dmwm/DBS.git
 git clone git@github.com:NDCMS/lobster.git
 cd lobster
-git checkout lobster-with-conda
+git checkout lobster-python3
 
 conda env create -f lobster_env.yaml
-conda activate lobster-with-conda
+conda activate base
 ```
 
-**Note:** this yaml creates an environment named `lobster-with-conda`, if you'd like to change the name of the environment, edit the first line of lobster_env.yaml before installing
+**Note:** this yaml creates an environment named `base`, if you'd like to change the name of the environment, edit the first line of lobster_env.yaml before installing
 
-Next, navigate back to the DBS directory and we will install a couple more packages). Run the following commands: 
-```
-python setup.py install_system -s dbs-client
-python setup.py install_system -s pycurl-client
-conda install -c conda-forge python-daemon
-```
 
-Then, navigate back to the cloned lobster directory (probably `cd ../lobster/`) and run the following command: 
+Then, still in the cloned lobster directory, run the following command: 
 ```
 pip install -e .
 ```
 
-Now that the lobster-with-conda env is setup, in the future all you need to do is run the following: 
+Now that the `base` env is setup, in the future all you need to do is run the following: 
 ```
 unset PYTHONPATH
 unset PERL5LIB
-conda activate lobster-with-conda
+conda activate base
 ```
 
 # Running a Simple Config
-In the lobster repository, there is a python script called "simple.py". This has been updated to work with `lobster-with-conda` and can be run in the following way: 
+In the lobster repository, there is a python script called "simple.py". This has been updated to work with `lobster-python3` and can be run in the following way: 
 
 1. Set up the necessary CMSSW release in the same directory as where you're running the config file (see directions below).
-2. unset the pythonpath and start the lobster-with-conda environment 
+2. unset the pythonpath and start the `base` environment 
 3. in the lobster/examples directory, do:  `lobster process simple.py`
-4. in the same directory, start a work_queue_factory with the following command: `/afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos rhel7 > /tmp/${USER}_factory.log`
-
-To run using python2 lobster on rhel9 machines, use the following command: 
-```
-nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.1.0 -S /tmp/wq-$USER-factory > /tmp/${USER}_factory.log &
-```
+4. in the same directory, start a work_queue_factory with the following command: `work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log`
 
 
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
@@ -75,15 +63,7 @@ For the simple.py script, we're using CMSSW_10_6_26. There are two options:
 # Possible Errors
 After submitting a lobster process and starting a work_queue_factory, if there are no errors in `process.err` or `process_debug.log` but workers are never assigned to the job, try the follwing: 
 - Kill the current work_queue_factory. 
-- Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json > /tmp/${USER}_factory.log &`
+- Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log &`
 
-If you submit a lobster process and get an error related to `parrot_run` in the `process.err` file, do the following while in the conda environment to add to your path: 
-```
-cp /afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/lobster-171-cd5e3e2c-cvmfs-70dfa0d6/bin/parrot_cvmfs_static_run $CONDA_PREFIX/bin/parrot_run
-```
-
-Update: 
-It is likely that instead of adding the above to your path, you will need to add this version: 
-```
-export PATH=/afs/crc.nd.edu/group/ccl/software/x86_64/redhat7/cctools/stable/bin:$PATH
-```
+If that does not result in workers being spawned, you can try running a worker directly:
+- `apptainer exec --bind /cvmfs:/cvmfs --bind <path_to_your_conda_env>:/cctools /afs/crc.nd.edu/group/ccl/software/runos/images/cc7-wq-7.11.1.img /cctools/bin/work_queue_worker -M "lobster_$USER.*" -dall --cores 1 --disk 10000 -t 150`
