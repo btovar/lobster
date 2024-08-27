@@ -18,11 +18,11 @@ git clone https://github.com/NDCMS/lobster.git
 cd lobster
 git checkout lobster-python3
 
-conda env create -f lobster_env.yaml
-conda activate base
+conda env create -f lobster_env.yaml -n lobster
+conda activate lobster
 ```
 
-**Note:** this yaml creates an environment named `base`, if you'd like to change the name of the environment, edit the first line of lobster_env.yaml before installing
+**Note:** this yaml creates an environment named `lobster`, if you'd like to change the name of the environment, edit the first line of lobster_env.yaml before installing
 
 
 Then, still in the cloned lobster directory, run the following command: 
@@ -30,23 +30,20 @@ Then, still in the cloned lobster directory, run the following command:
 pip install -e .
 ```
 
-Now that the `base` env is setup, in the future all you need to do is run the following: 
+Now that the `lobster` env is setup, in the future all you need to do is run the following: 
 ```
 unset PYTHONPATH
 unset PERL5LIB
-conda activate base
+conda activate lobster
 ```
 
 # Running a Simple Config
 In the lobster repository, there is a python script called "simple.py". This has been updated to work with `lobster-python3` and can be run in the following way: 
 
 1. Set up the necessary CMSSW release in the same directory as where you're running the config file (see directions below).
-2. unset the pythonpath and start the `base` environment 
+2. unset the pythonpath and start the `lobster` environment 
 3. in the lobster/examples directory, do:  `lobster process simple.py`
-4. in the same directory, start a work_queue_factory with the following command: `work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log`
-
-If the process is unable to write to disk and needs a scratch directory add the `-S` or `--scratch-dir` flag with a path to a temp folder.  
-The lobster working folder works fine for this, e.g. `/tmpscratch/users/$USER/lobster_test_` + datetime.  
+4. in the same directory, start a work_queue_factory with the following command: `work_queue_factory -T condor -M "lobster_${USER}.*" -dall -o /tmp/wq-factory-${USER}/debug.log -C factory.json --runos cc7-wq-7.11.1 --scratch-dir /tmp/wq-factory-${USER} > /tmp/wq-factory-${USER}/factory.log` 
 
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
@@ -64,8 +61,7 @@ For the simple.py script, we're using CMSSW_10_6_26. There are two options:
 # Possible Errors
 After submitting a lobster process and starting a work_queue_factory, if there are no errors in `process.err` or `process_debug.log` but workers are never assigned to the job, try the follwing: 
 - Kill the current work_queue_factory. 
-- Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C factory.json --runos cc7-wq-7.11.1 > /tmp/${USER}_factory.log &`
+- Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_${USER}.*" -dall -o /tmp/wq-factory-${USER}/debug.log -C factory.json --runos cc7-wq-7.11.1 > /tmp/wq-factory-${USER}/factory.log &`
 
-If that does not result in workers being spawned, you can try running a worker directly with the following command, where path_to_your_conda_env  
-is the base path where all the conda packages for your environment are installed, e.g. `$HOME/miniconda3/envs/base`:
-- `apptainer exec --bind /cvmfs:/cvmfs --bind <path_to_your_conda_env>:/cctools /afs/crc.nd.edu/group/ccl/software/runos/images/cc7-wq-7.11.1.img /cctools/bin/work_queue_worker -M "lobster_$USER.*" -dall --cores 1 --disk 10000 -t 150`
+If that does not result in workers being spawned, you can try running a worker directly with the following command:
+- `apptainer exec --bind /cvmfs:/cvmfs --bind $CONDA_PREFIX:/conda_env /afs/crc.nd.edu/group/ccl/software/runos/images/cc7-wq-7.11.1.img /conda_env/bin/work_queue_worker -M "lobster_${USER}.*" -dall --cores 1 --disk 10000 -t 150`
