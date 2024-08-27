@@ -22,10 +22,12 @@ conda env create -f lobster_env.yaml -n lobster
 conda activate lobster
 ```
 
-**Note:** this yaml creates an environment named `lobster`, if you'd like to change the name of the environment, edit the first line of lobster_env.yaml before installing
+**Note:** The yaml file and the above command creates an environment named `lobster`,  
+if you'd like to change the name of the environment, change the value after the `-n` flag  
+e.g. `conda env create -f lobster_env.yaml -n lobster-python3`
 
 
-Then, still in the cloned lobster directory, run the following command: 
+Then, still in the cloned lobster directory, run the following command to install lobster as an editable package: 
 ```
 pip install -e .
 ```
@@ -48,6 +50,9 @@ In the lobster repository, there is a python script called "simple.py". This has
 You can monitor the work_queue_factory by doing `work_queue_status` while in your conda environment.
 You can monitor the lobster process status by doing `lobster status [lobster working dir path]`. 
 
+This simple test script should spawn 3 data jobs and 1 merge job.  If you see repeated failed jobs in the logs then you should kill the process  
+and look for additional error reports in all the log files to assist in debugging.
+
 After the jobs are completed, check the output. In general, lobster output is stored in `cephfs`. For this simple config, there should be an `output*.root` file stored in `/cms/cephfs/data/store/user/USERNAME/lobster_test_*/ttH` that is roughly 8 MB.
 
 # Setting up a CMSSW environment for the simple example
@@ -61,7 +66,11 @@ For the simple.py script, we're using CMSSW_10_6_26. There are two options:
 # Possible Errors
 After submitting a lobster process and starting a work_queue_factory, if there are no errors in `process.err` or `process_debug.log` but workers are never assigned to the job, try the follwing: 
 - Kill the current work_queue_factory. 
-- Restart the work_queue_factory using the absolute path of work_queue: `nohup /afs/crc.nd.edu/group/ccl/software/x86_64/redhat9/cctools/stable/bin/work_queue_factory -T condor -M "lobster_${USER}.*" -dall -o /tmp/wq-factory-${USER}/debug.log -C factory.json --runos cc7-wq-7.11.1 > /tmp/wq-factory-${USER}/factory.log &`
-
-If that does not result in workers being spawned, you can try running a worker directly with the following command:
+- Try running a worker directly with the following command:
 - `apptainer exec --bind /cvmfs:/cvmfs --bind $CONDA_PREFIX:/conda_env /afs/crc.nd.edu/group/ccl/software/runos/images/cc7-wq-7.11.1.img /conda_env/bin/work_queue_worker -M "lobster_${USER}.*" -dall --cores 1 --disk 10000 -t 150`
+- If the manual worker succeeds and not the work_queue_factory then it may indicate a bug in lobster, or your environment.  Save your logs and contact the development team for help.
+
+# Other Troubleshooting
+- Did you remember to re-new your proxy?
+- Unset PYTHONPATH and PERL5LIB?
+- In the right conda env?  Run `work_queue_factory --version` and check the output for 7.11.1.
