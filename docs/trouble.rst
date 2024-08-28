@@ -12,8 +12,9 @@ Installation
 Python crashes due to library mismatches
 ........................................
 
-Make sure that all commands are issued in after executing ``cmsenv``.  Also
-attempt to clear out `$HOME/.local` and re-install.
+Make sure you have run:
+    `unset PYTHONPATH`
+    `unset PERL5LIB`
 
 Matplotlib fails to install
 ...........................

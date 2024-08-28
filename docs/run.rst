@@ -90,7 +90,7 @@ of disk space each.  It is included in the `examples` directory in the
 Lobster source distribution.  The factory can thus be started from within
 the Lobster source directory with::
 
-    nohup work_queue_factory -T condor -M "lobster_$USER.*" -dall -o /tmp/${USER}_factory.debug -C examples/factory.json > /tmp/${USER}_factory.log &
+    nohup work_queue_factory -T condor -M "lobster_${USER}.*" -dall -o /tmp/${USER}_factory.debug -C examples/factory.json > /tmp/${USER}_factory.log &
 
 If the log of the factory grows too large, removing the ``-dall`` will
 disable debug output, and considerably lessen disk usage.
@@ -106,7 +106,7 @@ disable debug output, and considerably lessen disk usage.
    to ask Work Queue to run your job using `Singularity`_.  This
    requires a change to the factory invocation as follows::
 
-       nohup work_queue_factory -T condor -M "lobster_$USER.*" -d all -o /tmp/${USER}_lobster_factory.debug -C examples/factory_singularity.json --wrapper "python /afs/crc.nd.edu/group/ccl/software/runos/runos.py rhel6" --extra-options="--workdir=/disk" --worker-binary=/afs/crc.nd.edu/group/ccl/software/x86_64/redhat6/cctools/$cctools/bin/work_queue_worker >&! /tmp/${USER}_lobster_factory.log &
+       nohup work_queue_factory -T condor -M "lobster_${USER}.*" -d all -o /tmp/${USER}_lobster_factory.debug -C examples/factory_singularity.json --runos cc7-wq-7.11.1 --extra-options="--workdir=/disk" >&! /tmp/${USER}_lobster_factory.log &
 
 .. _condor: http://condor.cse.nd.edu/condor_matrix.cgi
 .. _external bandwidth: http://prtg1.nm.nd.edu/sensor.htm?listid=491&timeout=60&id=505&position=0
