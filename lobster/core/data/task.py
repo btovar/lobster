@@ -836,6 +836,9 @@ def run_command(data, config, env):
         if os.path.isfile(cmd[0]):
             cmd[0] = os.path.join(os.getcwd(), cmd[0])
 
+        if not isinstance(cmd, list):
+            cmd = [cmd]
+
         cmd.extend([str(arg) for arg in args])
         if config.get('append inputs to args', False):
             cmd.extend(unique)
