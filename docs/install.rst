@@ -47,7 +47,7 @@ easy modification of the source::
 Confirm Installation
 ~~~~~~~~~~~~~~~~~~~~
 
-Check your python version after running `conda env create -f lobster_env.yaml -n lobster`::
+Check your python version after running `conda activate lobster`::
 
     $ python -V
     Python 3.10.14
