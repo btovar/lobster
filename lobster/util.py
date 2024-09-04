@@ -18,7 +18,7 @@ import shutil
 import smtplib
 import subprocess
 import time
-
+import math
 from contextlib import contextmanager
 from email.mime.text import MIMEText
 from pkg_resources import get_distribution
@@ -318,7 +318,8 @@ def id2dir(id):
     # only.
     id = int(id)
     man = str(id % 10000).zfill(4)
-    oku = str(id / 10000).zfill(4)
+    #oku = str(id / 10000).zfill(4)
+    oku = str(math.floor(id / 10000)).zfill(4)  # python3 fix, oku should be 0000 until 10000 jobs, then 0001, etc...
     return os.path.join(oku, man)
 
 
