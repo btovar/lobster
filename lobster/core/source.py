@@ -278,7 +278,7 @@ class TaskProvider(util.Timing):
             "FwkJobReport",
             "Services",
             "Storage",
-            #"Utils",
+            "../Utils",
             "WMException.py",
             "WMExceptions.py"
         ]
