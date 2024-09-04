@@ -17,7 +17,7 @@ import os
 import os.path
 import logging
 
-from lobster.WMCore.Utils.FileTools import calculateChecksums
+from WMCore.Utils.FileTools import calculateChecksums
 
 
 class FileInfo(object):

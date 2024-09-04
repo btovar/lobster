@@ -22,8 +22,8 @@ import xml.dom.minidom
 
 sys.path.append('lobster')
 
-from lobster.WMCore.DataStructs.LumiList import LumiList
-from lobster.WMCore.FwkJobReport.Report import Report
+from WMCore.DataStructs.LumiList import LumiList
+from WMCore.FwkJobReport.Report import Report
 
 import ROOT
 

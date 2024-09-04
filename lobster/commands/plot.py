@@ -32,7 +32,7 @@ from lobster import util
 from lobster.core import unit
 from lobster.core.command import Command
 
-from lobster.WMCore.DataStructs.LumiList import LumiList
+from WMCore.DataStructs.LumiList import LumiList
 
 matplotlib.rc('axes', labelsize='large')
 matplotlib.rc('figure', figsize=(8, 1.5))

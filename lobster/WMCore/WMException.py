@@ -14,7 +14,7 @@ import logging
 import sys
 import traceback
 
-from lobster.WMCore.Utils.Utilities import decodeBytesToUnicode
+from WMCore.Utils.Utilities import decodeBytesToUnicode
 # from lobster.WMCore.Configuration import PY3
 
 WMEXCEPTION_START_STR = str("<@========== WMException Start ==========@>")

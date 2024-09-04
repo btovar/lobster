@@ -9,9 +9,9 @@ from __future__ import division
 from builtins import object
 import os.path
 
-from lobster.WMCore.DataStructs.File import File
-from lobster.WMCore.FwkJobReport import Report
-from lobster.WMCore.Services.UUIDLib import makeUUID
+from WMCore.DataStructs.File import File
+from WMCore.FwkJobReport import Report
+from WMCore.Services.UUIDLib import makeUUID
 
 
 class ReportEmu(object):

@@ -16,7 +16,7 @@ setup(
         'lobster.core',
         'lobster.commands',
         'lobster.monitor',
-        'lobster.WMCore',
+        #'lobster.WMCore',
     ],
     package_data={'lobster': [
         'core/data/autosense.sh',

@@ -9,7 +9,7 @@ from lobster import util
 from lobster.core.dataset import FileInfo
 from . import unit
 
-from lobster.WMCore.DataStructs.LumiList import LumiList
+from WMCore.DataStructs.LumiList import LumiList
 
 __all__ = ['TaskHandler', 'MergeTaskHandler', 'ProductionTaskHandler']
 

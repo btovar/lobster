@@ -12,8 +12,8 @@ import os
 
 from builtins import next, str, object
 
-from lobster.WMCore.Algorithms.ParseXMLFile import xmlFileToNode
-from lobster.WMCore.Storage.RucioFileCatalog import rseName
+from WMCore.Algorithms.ParseXMLFile import xmlFileToNode
+from WMCore.Storage.RucioFileCatalog import rseName
 
 
 def loadSiteLocalConfig():

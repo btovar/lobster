@@ -8,8 +8,8 @@ Data object that contains details for a single file
 from builtins import str, bytes
 __all__ = []
 
-from lobster.WMCore.DataStructs.Run import Run
-from lobster.WMCore.DataStructs.WMObject import WMObject
+from WMCore.DataStructs.Run import Run
+from WMCore.DataStructs.WMObject import WMObject
 
 
 class File(WMObject, dict):

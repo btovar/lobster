@@ -17,13 +17,13 @@ import time
 import traceback
 
 #from Utils.PythonVersion import PY3
-from lobster.WMCore.Utils.Utilities import decodeBytesToUnicode, encodeUnicodeToBytes
-from lobster.WMCore.Configuration import ConfigSection
-from lobster.WMCore.DataStructs.File import File
-from lobster.WMCore.DataStructs.Run import Run
-from lobster.WMCore.FwkJobReport.FileInfo import FileInfo
-from lobster.WMCore.WMException import WMException
-from lobster.WMCore.WMExceptions import WM_JOB_ERROR_CODES
+from WMCore.Utils.Utilities import decodeBytesToUnicode, encodeUnicodeToBytes
+from WMCore.Configuration import ConfigSection
+from WMCore.DataStructs.File import File
+from WMCore.DataStructs.Run import Run
+from WMCore.FwkJobReport.FileInfo import FileInfo
+from WMCore.WMException import WMException
+from WMCore.WMExceptions import WM_JOB_ERROR_CODES
 
 import pickle
 

@@ -12,8 +12,8 @@ from future.utils import viewitems, listitems
 import hashlib
 from builtins import str as newstr, bytes as newbytes
 # from Utils.PythonVersion import PY3
-from lobster.WMCore.Utils.Utilities import encodeUnicodeToBytesConditional, encodeUnicodeToBytes
-from lobster.WMCore.DataStructs.WMObject import WMObject
+from WMCore.Utils.Utilities import encodeUnicodeToBytesConditional, encodeUnicodeToBytes
+from WMCore.DataStructs.WMObject import WMObject
 
 
 class Run(WMObject):

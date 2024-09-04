@@ -12,7 +12,7 @@ import subprocess
 import time
 import zlib
 
-from lobster.WMCore.Utils.Utilities import decodeBytesToUnicode
+from WMCore.Utils.Utilities import decodeBytesToUnicode
 
 
 def findFiles(path, pat):
