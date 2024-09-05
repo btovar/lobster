@@ -44,6 +44,14 @@ easy modification of the source::
     conda env create -f lobster_env.yaml -n lobster
     pip install -e .
 
+WMCore is a necessary component of lobster, but not all of it is needed,
+so to start you should clone WMCore and do the following modifications::
+
+    git clone git@github.com:dmwm/WMCore.git --branch 2.3.5
+    cd WMCore
+    sed -i -E '/^(gfal2|htcondor|kkmysqlclient|rucio-clients|Sphinx|coverage|memory-profiler|mox3|nose|nose2|pycodestyle|pylint|pymongo)/d' requirements.txt
+    pip install -r requirements.txt .
+
 Confirm Installation
 ~~~~~~~~~~~~~~~~~~~~
 
