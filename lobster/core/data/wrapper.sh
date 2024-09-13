@@ -41,7 +41,6 @@ export LOBSTER_LCG_CP LOBSTER_GFAL_COPY
 # determine grid proxy needs
 LOBSTER_PROXY_INFO=$(command -v grid-proxy-init)
 
-unset PARROT_HELPER
 export PYTHONPATH=python:$PYTHONPATH
 
 if [ -z "$LD_LIBRARY_PATH" ]; then
@@ -94,9 +93,7 @@ elif [ ! \( -f "/cvmfs/cms.cern.ch/cmsset_default.sh" \
 	# Make sure that the cvmfs cache is actually shared, this can save
 	# up to 1 GB per task in disk usage.
 	export PARROT_CVMFS_ALIEN_CACHE=${PARROT_CACHE}/cvmfs
-	export PARROT_HELPER=$(readlink -f ${PARROT_PATH%bin*}lib/libparrot_helper.so)
 
-	log "parrot helper: $PARROT_HELPER"
 	log "cache" "content of $PARROT_CACHE" ls -lt $PARROT_CACHE
 
 	# Variables needed to set symlinks in CVMFS
@@ -108,19 +105,22 @@ elif [ ! \( -f "/cvmfs/cms.cern.ch/cmsset_default.sh" \
 	export OASIS_CERTIFICATES=${OASIS_CERTIFICATES:-/cvmfs/oasis.opensciencegrid.org/mis/certificates}
 	log "OSG certificate location: $OASIS_CERTIFICATES"
 
-	log "testing parrot usage"
-	if [ -n "$(ldd $PARROT_PATH/parrot_run 2>&1 | grep 'not found')" ]; then
-		log "ldd" "linkage of parrot" ldd $PARROT_PATH/parrot_run
-		exit 169
-	else
-		log "parrot OK"
-	fi
+    if [ ! -f /cvmfs/cms.cern.ch/cmsset_default.sh ]
+    then
+        log "testing parrot usage"
+        if [ -n "$(ldd $PARROT_PATH/parrot_run 2>&1 | grep 'not found')" ]; then
+            log "ldd" "linkage of parrot" ldd $PARROT_PATH/parrot_run
+            exit 169
+        else
+            log "parrot OK"
+        fi
 
-	# FIXME the -M could be removed once local site setting via
-	# environment works
-	log "starting parrot to access CMSSW..."
-	exec $PARROT_PATH/parrot_run -M /cvmfs/cms.cern.ch/SITECONF/local=$PWD/siteconf -M /sbin/ifconfig=/bin/echo -t "$PARROT_CACHE/ex_parrot_$(whoami)" -p "$HTTP_PROXY" bash $0 "$*"
-	# exec $PARROT_PATH/parrot_run -t "$PARROT_CACHE/ex_parrot_$(whoami)" bash $0 "$*"
+        # FIXME the -M could be removed once local site setting via
+        # environment works
+        log "starting parrot to access CMSSW..."
+        exec $PARROT_PATH/parrot_run -M /cvmfs/cms.cern.ch/SITECONF/local=$PWD/siteconf -M /sbin/ifconfig=/bin/echo -t "$PARROT_CACHE/ex_parrot_$(whoami)" -p "$HTTP_PROXY" bash $0 "$*"
+        # exec $PARROT_PATH/parrot_run -t "$PARROT_CACHE/ex_parrot_$(whoami)" bash $0 "$*"
+    fi
 fi
 
 log "sourcing CMS setup"
