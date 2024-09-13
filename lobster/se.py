@@ -317,6 +317,19 @@ class XrootD(StorageElement):
     def mkdir(self, path, mode=None):
         self.execute('mkdir -p', path)
 
+    def permissions(self, path):
+        try:
+            output = self.execute('stat', path)
+            for line in output.strip("\n").splitlines():
+                field, value = line.split(':', 1)
+                if field == 'Mode':
+                    mode = int(value.strip())
+                    return (mode & 0o777)
+            # If we got here, never found any mention of flags, just say false.
+            return False
+        except Exception:
+            return False
+
     def remove(self, *paths):
         # It doesn't seem like Xrdfs supports either recursive or batch removal, so let's do it one at a time.
         for path in paths:
