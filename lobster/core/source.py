@@ -22,7 +22,7 @@ from lobster.core import MergeTaskHandler
 # disable site config during py2 to py3 transition
 enable_wmcore = True
 if enable_wmcore:
-    from lobster.WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
+    from WMCore.Storage.SiteLocalConfig import loadSiteLocalConfig, SiteConfigError
 else:
     class SiteConfigError(Exception):
         pass
@@ -260,15 +260,15 @@ class TaskProvider(util.Timing):
             (os.path.join(os.path.dirname(__file__), 'data', 'wrapper.sh'), 'wrapper.sh', True),
             (os.path.join(os.path.dirname(__file__), 'data', 'task.py'), 'task.py', True),
             (os.path.join(os.path.dirname(__file__), 'data', 'report.json.in'), 'report.json.in', True),
-            (os.path.join(os.path.dirname(__file__), '..', '__init__.py'), os.path.join('lobster', '__init__.py'), True),
+            #(os.path.join(os.path.dirname(__file__), '..', '__init__.py'), os.path.join('lobster', '__init__.py'), True),
             (self.parrot_bin, 'bin', True),
         ]
 
         # Files to make the task wrapper work without referencing WMCore
         # from somewhere else
-        import lobster.WMCore as WMCore
-        #base = os.path.dirname(WMCore.__file__)
-        base = os.path.join(os.path.dirname(__file__), "..", "WMCore")
+        import WMCore as WMCore
+        base = os.path.dirname(WMCore.__file__)
+        #base = os.path.join(os.path.dirname(__file__), "..", "WMCore")
         reqs = [
             "__init__.py",
             "Algorithms",
@@ -278,12 +278,12 @@ class TaskProvider(util.Timing):
             "FwkJobReport",
             "Services",
             "Storage",
-            "Utils",
+            "../Utils",
             "WMException.py",
             "WMExceptions.py"
         ]
         for f in reqs:
-            self._inputs.append((os.path.join(base, f), os.path.join("lobster", "WMCore", f), True))
+            self._inputs.append((os.path.join(base, f), os.path.join("python", "WMCore", f), True))
 
         if 'X509_USER_PROXY' in os.environ:
             self._inputs.append((os.environ['X509_USER_PROXY'], 'proxy', False))

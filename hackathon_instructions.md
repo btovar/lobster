@@ -20,6 +20,15 @@ git checkout lobster-python3
 
 conda env create -f lobster_env.yaml -n lobster
 conda activate lobster
+
+cd ..  # back to lobster-python3/
+
+git clone git@github.com:dmwm/WMCore.git --branch 2.3.5
+cd WMCore
+sed -i -E '/^(gfal2|htcondor|kkmysqlclient|rucio-clients|Sphinx|coverage|memory-profiler|mox3|nose|nose2|pycodestyle|pylint|pymongo)/d' requirements.txt
+pip install -r requirements.txt .
+
+cd ../lobster   # to lobster-python3/lobster
 ```
 
 **Note:** The yaml file and the above command creates an environment named `lobster`,  

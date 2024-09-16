@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from lobster.WMCore.Credential.Proxy import Proxy as WMProxy
+from WMCore.Credential.Proxy import Proxy as WMProxy
 from lobster.util import Configurable, PartiallyMutable
 
 

@@ -12,8 +12,8 @@ from lobster.core.dataset import DatasetInfo
 from lobster.util import Configurable
 
 from dbs.apis.dbsClient import DbsApi
-from lobster.WMCore.Credential.Proxy import Proxy
-from lobster.WMCore.DataStructs.LumiList import LumiList
+from WMCore.Credential.Proxy import Proxy
+from WMCore.DataStructs.LumiList import LumiList
 
 logger = logging.getLogger('lobster.cmssw.dataset')
 
